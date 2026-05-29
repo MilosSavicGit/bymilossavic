@@ -1,0 +1,6 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Point crawlers to the sitemap
+Sitemap: https://bymilossavic.com/sitemap.xml
