@@ -908,6 +908,8 @@ function drawPins(stops) {
       'color:#fff;font:700 11px sans-serif;display:grid;place-items:center;cursor:pointer;' +
       'border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
     el.textContent = i + 1;
+    // native hover tooltip (desktop only — no-op on mobile, which is correct)
+    el.title = `${i + 1}. ${s.name}`;
     el.onclick = () => openDetail(s.id);
     new maplibregl.Marker({ element: el }).setLngLat([s.lng, s.lat]).addTo(map);
   });
