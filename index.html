@@ -2,1101 +2,354 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>RoadScout — find the stops worth making</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="msvalidate.01" content="838BF69BCE51D0CD2113489AC4892820" />
+<title>Cultural Map — find the stops worth making</title>
+<meta name="description" content="Cultural Map scans your driving route for cultural attractions worth stopping for — monuments, museums, viewpoints, hidden gems — listed in the order you'll reach them. Free, worldwide, in your language.">
 
-<!-- ============================================================
-     EXTERNAL LIBRARIES (loaded from public CDNs, no install)
-     - MapLibre GL JS : the open-source map display engine
-     - Turf.js        : the geometry toolkit (buffer, point-in-polygon, etc.)
-     These are the only two big dependencies. Everything else is
-     plain browser JavaScript.
-     ============================================================ -->
-<link href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.1.0/turf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Open Graph / social preview -->
+<meta property="og:title" content="Cultural Map — find the stops worth making">
+<meta property="og:description" content="Scan any driving route for cultural attractions worth stopping for. Free, worldwide, in your language.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Spline+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-  /* ---- Theme tokens: change these to restyle the whole app ---- */
   :root {
-    --ink:      #1c1a17;   /* near-black text */
-    --paper:    #f4efe6;   /* warm off-white background */
-    --panel:    #fffdf8;   /* card background */
-    --rule:     #d8cfbe;   /* hairline borders */
-    --accent:   #b5471f;   /* terracotta — buttons, route line */
-    --accent-2: #2f6b4f;   /* pine green — "worth it" */
-    --muted:    #8a7f6d;   /* dimmed labels */
-    --good:     #2f6b4f;
-    --meh:      #b8861b;
-    --skip:     #9a4226;
-    --shadow:   0 1px 0 rgba(0,0,0,.04), 0 8px 24px -12px rgba(60,40,20,.35);
+    --paper:    #f6f1e7;
+    --paper-2:  #efe7d6;
+    --ink:      #2a2118;
+    --muted:    #6f6452;
+    --accent:   #b5471f;   /* terracotta */
+    --accent-2: #2f6b4f;   /* pine green  */
+    --rule:     #ddd1bb;
+    --shadow:   rgba(60, 40, 20, 0.13);
   }
 
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
 
   body {
-    margin: 0;
-    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    font-family: 'Spline Sans', system-ui, sans-serif;
     color: var(--ink);
     background: var(--paper);
-    /* subtle paper grain via layered gradients */
+    line-height: 1.6;
+    overflow-x: hidden;
+    /* subtle paper grain */
     background-image:
-      radial-gradient(circle at 20% 10%, rgba(181,71,31,.04), transparent 40%),
-      radial-gradient(circle at 80% 90%, rgba(47,107,79,.04), transparent 40%);
+      radial-gradient(circle at 15% 20%, rgba(181,71,31,0.04), transparent 40%),
+      radial-gradient(circle at 85% 70%, rgba(47,107,79,0.05), transparent 45%);
   }
 
-  /* ---- Layout: control panel on the left, map on the right ---- */
-  .app {
-    display: grid;
-    grid-template-columns: 420px 1fr;
-    height: 100vh;            /* fallback */
-    height: 100dvh;          /* real mobile viewport height */
-  }
-  @media (max-width: 820px) {
-    .app { grid-template-columns: 1fr; grid-template-rows: 1fr 320px; }
-    #map { order: 2; }
-  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
 
-  .panel {
-    overflow-y: auto;
-    padding: 26px 24px 60px;
-    border-right: 1px solid var(--rule);
-    background: var(--panel);
-    box-shadow: var(--shadow);
-  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line-height: 1.1; }
 
-  header h1 {
-    font-size: 30px;
-    margin: 0 0 2px;
-    letter-spacing: -0.5px;
-  }
-  header .tag {
-    color: var(--muted);
-    font-size: 14px;
-    font-style: italic;
-    margin-bottom: 22px;
-  }
+  a { color: inherit; }
 
-  /* ---- The route input form ---- */
-  .field { margin-bottom: 12px; }
-  .field label {
-    display: block;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-  .field input {
-    width: 100%;
-    padding: 10px 12px;
-    font: inherit;
-    font-size: 15px;
-    border: 1px solid var(--rule);
-    border-radius: 6px;
-    background: #fff;
-    color: var(--ink);
-  }
-  .field input:focus { outline: 2px solid var(--accent); border-color: transparent; }
-
-  .row { display: flex; gap: 10px; align-items: center; }
-  .row .field { flex: 1; }
-
-  button.go {
-    width: 100%;
-    margin-top: 8px;
-    padding: 13px;
-    font: inherit;
-    font-size: 16px;
-    font-weight: 600;
-    color: #fff;
-    background: var(--accent);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: transform .08s ease, filter .15s ease;
-  }
-  button.go:hover { filter: brightness(1.06); }
-  button.go:active { transform: translateY(1px); }
-  button.go:disabled { opacity: .5; cursor: progress; }
-
-  .controls-note { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
-
-  /* ---- Status / loading line ---- */
-  #status {
-    margin: 18px 0 4px;
-    font-size: 13px;
-    color: var(--muted);
-    min-height: 18px;
-  }
-
-  /* ---- The list of stops ---- */
-  .stops { list-style: none; margin: 14px 0 0; padding: 0; }
-  .stop {
-    border: 1px solid var(--rule);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    background: #fff;
-    cursor: pointer;
-    transition: border-color .15s ease, transform .08s ease;
+  /* ---------- top bar ---------- */
+  header {
+    padding: 26px 0;
     position: relative;
+    z-index: 5;
   }
-  .stop:hover { border-color: var(--accent); }
-  .stop.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  .stop .seq {
-    position: absolute; top: -9px; left: -9px;
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--accent); color: #fff;
-    font-size: 12px; font-weight: 700;
-    display: grid; place-items: center;
+  .bar { display: flex; align-items: center; justify-content: space-between; }
+  .brand {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px;
+    letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px;
   }
-  .stop h3 { margin: 0 0 3px; font-size: 16px; }
-  .stop .meta { font-size: 12px; color: var(--muted); }
-  .stop .kind {
-    display: inline-block; font-size: 10px; letter-spacing: 1px;
+  .brand .dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent); display: inline-grid; place-items: center;
+    color: #fff; font-size: 14px; transform: rotate(-8deg);
+  }
+  .brand small { font-family: 'Spline Sans', sans-serif; font-weight: 400;
+    font-size: 12px; color: var(--muted); margin-left: 2px; }
+  .nav-cta {
+    font-size: 14px; font-weight: 600; text-decoration: none;
+    background: var(--ink); color: var(--paper);
+    padding: 9px 17px; border-radius: 100px; transition: transform .15s, background .15s;
+  }
+  .nav-cta:hover { transform: translateY(-1px); background: var(--accent); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 48px 0 30px; position: relative; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 50px; align-items: center;
+  }
+  .eyebrow {
+    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--accent-2);
-    border: 1px solid var(--accent-2); border-radius: 3px;
-    padding: 1px 5px; margin-top: 6px;
+    border: 1px solid var(--rule); border-radius: 100px; padding: 5px 14px;
+    margin-bottom: 22px; background: rgba(255,255,255,0.5);
   }
-
-  /* ---- The detail panel: a simple show/hide block, NOT a sliding
-     overlay. When open it sits fixed over the left panel and fully
-     covers it; when closed it's display:none and the list is shown.
-     This avoids the stuck-transform bug the overlay version had. ---- */
-  .detail {
-    position: fixed; top: 0; left: 0; width: 420px;
-    height: 100vh;            /* fallback for older browsers */
-    height: 100dvh;           /* real visible height on mobile (fixes iOS Safari) */
-    background: var(--panel);
-    border-right: 1px solid var(--rule);
-    padding: 26px 24px;
-    /* extra bottom padding (plus iOS safe-area) so the verdict buttons are
-       never flush against / past the screen edge in portrait */
-    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;   /* smooth momentum scroll on iOS */
-    z-index: 30;
-    box-shadow: var(--shadow);
-    display: none;            /* hidden by default */
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 68px); letter-spacing: -0.02em; margin-bottom: 20px;
   }
-  .detail.open { display: block; }   /* shown when a stop is selected */
-  @media (max-width: 820px) { .detail { width: 100%; } }
-
-  .detail .back {
-    background: none; border: none; color: var(--accent);
-    font: inherit; font-size: 14px; cursor: pointer; padding: 0;
-    margin-bottom: 16px;
+  .hero h1 .em { color: var(--accent); font-style: italic; font-weight: 500; }
+  .lede { font-size: clamp(17px, 2.2vw, 20px); color: var(--muted); max-width: 30em; margin-bottom: 30px; }
+  .cta-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    font: inherit; font-weight: 600; font-size: 16px; text-decoration: none;
+    padding: 14px 26px; border-radius: 100px; cursor: pointer; transition: transform .15s, box-shadow .15s;
+    display: inline-flex; align-items: center; gap: 9px;
   }
-  .detail h2 { margin: 0 0 6px; font-size: 24px; }
-  /* number badge next to the detail title, matching the map pins */
-  .num-badge {
-    display: inline-grid; place-items: center;
-    width: 28px; height: 28px; border-radius: 50%;
-    background: var(--accent-2); color: #fff;
-    font-size: 15px; font-weight: 700;
-    vertical-align: middle; margin-right: 6px;
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 8px 22px rgba(181,71,31,0.28); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(181,71,31,0.36); }
+  .btn-ghost { color: var(--ink); border: 1.5px solid var(--rule); background: rgba(255,255,255,0.4); }
+  .btn-ghost:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .free-note { font-size: 13px; color: var(--muted); margin-top: 14px; }
+
+  /* ---------- hero visual: stylized map card ---------- */
+  .map-card {
+    position: relative; aspect-ratio: 4/5; border-radius: 22px; overflow: hidden;
+    background: linear-gradient(160deg, #e9e0cd, #dccfb3);
+    box-shadow: 0 26px 60px var(--shadow); border: 1px solid rgba(255,255,255,0.5);
+    transform: rotate(1.4deg);
   }
-  .detail .summary { line-height: 1.6; font-size: 15px; margin: 14px 0; }
-  .detail img { width: 100%; border-radius: 8px; margin: 10px 0; }
-
-  /* ---- The verdict buttons (the ratings questionnaire) ---- */
-  .verdict-q { font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
-               color: var(--muted); margin: 22px 0 8px; }
-  .verdicts { display: flex; gap: 8px; }
-  .verdicts button {
-    flex: 1; padding: 12px 6px; font: inherit; font-size: 13px; font-weight: 600;
-    border: 1px solid var(--rule); border-radius: 8px; background: #fff;
-    cursor: pointer; transition: all .12s ease;
+  .map-card svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .map-float {
+    position: absolute; background: var(--paper); border-radius: 13px;
+    box-shadow: 0 10px 26px var(--shadow); padding: 11px 13px; width: 200px;
+    border: 1px solid var(--rule);
   }
-  .verdicts button:hover { border-color: var(--ink); }
-  .verdicts button.sel-good { background: var(--good); color:#fff; border-color: var(--good); }
-  .verdicts button.sel-meh  { background: var(--meh);  color:#fff; border-color: var(--meh); }
-  .verdicts button.sel-skip { background: var(--skip); color:#fff; border-color: var(--skip); }
+  .map-float .ti { font-family:'Fraunces',serif; font-weight: 600; font-size: 14.5px; display:flex; gap:7px; align-items:center;}
+  .map-float .ti .n { background: var(--accent-2); color:#fff; width:20px; height:20px; border-radius:50%;
+    display:inline-grid; place-items:center; font-size:11px; font-family:'Spline Sans',sans-serif; flex:none;}
+  .map-float .sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; padding-left: 27px; }
+  .f1 { top: 12%; left: 8%; }
+  .f2 { bottom: 14%; right: 7%; }
+  .pin { position:absolute; width:26px; height:26px; border-radius:50% 50% 50% 0;
+    background:var(--accent); transform: rotate(-45deg); box-shadow:0 4px 10px rgba(0,0,0,.25);}
+  .pin::after{content:''; position:absolute; inset:7px; background:var(--paper); border-radius:50%;}
+  .pin.p1{ top:30%; left:42%;} .pin.p2{ top:54%; left:58%; background:var(--accent-2);} .pin.p3{ top:72%; left:34%;}
 
-  .tally { margin-top: 14px; font-size: 13px; color: var(--muted); }
-  .tally b { color: var(--ink); }
+  /* ---------- strip ---------- */
+  .strip { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    margin-top: 44px; padding: 18px 0; background: rgba(255,255,255,0.35); }
+  .strip .wrap { display: flex; gap: 38px; flex-wrap: wrap; justify-content: center;
+    font-size: 14.5px; color: var(--muted); }
+  .strip b { color: var(--ink); font-weight: 600; }
 
-  #map { width: 100%; height: 100%; }
+  /* ---------- how it works ---------- */
+  section { padding: 78px 0; }
+  .sec-head { text-align: center; margin-bottom: 52px; }
+  .sec-head h2 { font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.02em; margin-bottom: 12px; }
+  .sec-head p { color: var(--muted); font-size: 17px; max-width: 34em; margin: 0 auto; }
 
-  /* Map style switcher (Streets / Outdoor / Satellite) */
-  #styleSwitcher {
-    position: absolute; top: 12px; right: 12px; z-index: 20;
-    display: flex; gap: 4px;
-    background: rgba(255,253,248,.9); padding: 4px; border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .step {
+    background: rgba(255,255,255,0.55); border: 1px solid var(--rule); border-radius: 18px;
+    padding: 30px 26px; position: relative; transition: transform .18s, box-shadow .18s;
   }
-  .style-btn {
-    font: inherit; font-size: 12px; padding: 5px 10px;
-    border: none; border-radius: 5px; background: transparent;
-    color: var(--ink); cursor: pointer;
+  .step:hover { transform: translateY(-4px); box-shadow: 0 16px 34px var(--shadow); }
+  .step .num {
+    font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #fff;
+    background: var(--accent); width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center; margin-bottom: 18px;
   }
-  .style-btn:hover { background: rgba(0,0,0,.06); }
-  .style-btn.active { background: var(--accent); color: #fff; }
+  .step:nth-child(2) .num { background: var(--accent-2); }
+  .step:nth-child(3) .num { background: var(--ink); }
+  .step h3 { font-size: 21px; margin-bottom: 9px; }
+  .step p { color: var(--muted); font-size: 15px; }
 
-  .empty { color: var(--muted); font-style: italic; margin-top: 20px; font-size: 14px; }
+  /* ---------- features ---------- */
+  .features { background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .feat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 40px; }
+  .feat { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; }
+  .feat .ic {
+    flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--paper);
+    border: 1px solid var(--rule); display: grid; place-items: center; font-size: 20px;
+  }
+  .feat h3 { font-size: 18px; margin-bottom: 4px; }
+  .feat p { color: var(--muted); font-size: 14.5px; }
+
+  /* ---------- story ---------- */
+  .story .wrap { max-width: 720px; text-align: center; }
+  .story h2 { font-size: clamp(28px, 3.6vw, 38px); margin-bottom: 22px; letter-spacing: -0.02em; }
+  .story p { font-size: 18px; color: var(--ink); margin-bottom: 18px; }
+  .story .sig { font-family: 'Fraunces', serif; font-style: italic; font-size: 19px; color: var(--accent); margin-top: 10px; }
+
+  /* ---------- final CTA ---------- */
+  .final { text-align: center; }
+  .final-card {
+    background: var(--ink); color: var(--paper); border-radius: 26px;
+    padding: 64px 40px; position: relative; overflow: hidden;
+  }
+  .final-card::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(circle at 20% 0%, rgba(181,71,31,0.4), transparent 50%),
+                radial-gradient(circle at 90% 100%, rgba(47,107,79,0.35), transparent 50%);
+  }
+  .final-card > * { position: relative; }
+  .final-card h2 { font-size: clamp(30px, 4.5vw, 46px); margin-bottom: 16px; letter-spacing:-0.02em; }
+  .final-card p { color: rgba(246,241,231,0.78); font-size: 18px; margin-bottom: 30px; max-width: 30em; margin-left:auto; margin-right:auto;}
+  .final-card .btn-primary { background: var(--paper); color: var(--ink); box-shadow: 0 8px 22px rgba(0,0,0,0.3); }
+  .final-card .btn-primary:hover { background: #fff; }
+
+  /* ---------- footer ---------- */
+  footer { padding: 40px 0 56px; text-align: center; color: var(--muted); font-size: 14px; }
+  footer .brand { justify-content: center; font-size: 18px; margin-bottom: 12px; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* reveal animation */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .map-card { max-width: 360px; margin: 0 auto; transform: none; }
+    .steps { grid-template-columns: 1fr; }
+    .feat-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
-
 <body>
-<div class="app">
 
-  <!-- ===================== LEFT: control panel ===================== -->
-  <div class="panel">
-    <header>
-      <h1>RoadScout</h1>
-      <div class="tag">the stops worth making, in the order you'll reach them</div>
-    </header>
-
-    <!-- Route input. We accept "lat,lng" OR a place name (geocoded). -->
-    <div class="field">
-      <label>From</label>
-      <input id="from" placeholder="e.g. Belgrade  or  44.8125,20.4612" value="Belgrade, Serbia">
-    </div>
-    <div class="field">
-      <label>To</label>
-      <input id="to" placeholder="e.g. Novi Sad  or  45.2671,19.8335" value="Novi Sad, Serbia">
-    </div>
-    <div class="row">
-      <div class="field">
-        <label>Corridor width (km each side)</label>
-        <input id="width" type="number" value="1" min="0.5" max="20" step="0.5">
-      </div>
-      <div class="field">
-        <label>Max detour (km off route)</label>
-        <input id="maxDetour" type="number" value="2" min="0.1" max="20" step="0.5">
-      </div>
-    </div>
-    <div class="row">
-      <div class="field">
-        <label>Max attractions (most notable kept)</label>
-        <input id="maxAttractions" type="number" value="200" min="5" max="500" step="5">
-      </div>
-    </div>
-    <div class="controls-note" style="color:var(--accent);margin-top:6px">
-      ⚠ A wider corridor finds more, but on a long route it can return too many
-      points and the search may fail. If that happens, keep the corridor narrow,
-      or scan a shorter route.
-    </div>
-
-    <button class="go" id="go">Show routes</button>
-    <div class="controls-note">
-      Uses free public services: OSRM for the route, OpenStreetMap (Overpass)
-      for points of interest, Wikipedia for descriptions. No keys, no accounts.
-    </div>
-
-    <div id="status"></div>
-    <ul class="stops" id="stops"></ul>
-    <div class="empty" id="empty">Enter a start and destination, then show routes — and click one to scan it.</div>
+<header>
+  <div class="wrap bar">
+    <div class="brand"><span class="dot">↗</span> Cultural Map <small>by Miloš Savić</small></div>
+    <a class="nav-cta" href="https://milossavicgit.github.io/cultural-map/">Open the app</a>
   </div>
+</header>
 
-  <!-- ===================== detail overlay ===================== -->
-  <div class="detail" id="detail">
-    <button class="back" id="back">‹ back to the list</button>
-    <div id="detailBody"></div>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Free · Worldwide · In your language</span>
+      <h1>Find the stops <span class="em">worth making.</span></h1>
+      <p class="lede">Cultural Map scans your driving route for cultural attractions worth stopping for — monuments, museums, viewpoints, quiet hidden gems — listed in the order you'll reach them.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://milossavicgit.github.io/cultural-map/">Plan a route →</a>
+        <a class="btn btn-ghost" href="#how">See how it works</a>
+      </div>
+      <p class="free-note">No account. No cost. Works almost anywhere in the world.</p>
+    </div>
+
+    <!-- stylized map illustration -->
+    <div class="map-card">
+      <svg viewBox="0 0 400 500" preserveAspectRatio="none" aria-hidden="true">
+        <!-- soft land blocks -->
+        <rect x="0" y="0" width="400" height="500" fill="#e4dac2"/>
+        <path d="M-20,120 Q120,90 260,150 T440,140 L440,-20 L-20,-20 Z" fill="#dcd0b0" opacity="0.7"/>
+        <path d="M-20,400 Q140,360 280,420 T440,400 L440,520 L-20,520 Z" fill="#d2e0cf" opacity="0.6"/>
+        <!-- route line -->
+        <path d="M70,460 C120,360 220,360 230,260 C238,180 150,150 200,60"
+              fill="none" stroke="#b5471f" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 13" opacity="0.9"/>
+        <path d="M70,460 C120,360 220,360 230,260 C238,180 150,150 200,60"
+              fill="none" stroke="#b5471f" stroke-width="5" stroke-linecap="round" opacity="0.18"/>
+      </svg>
+      <span class="pin p1"></span>
+      <span class="pin p2"></span>
+      <span class="pin p3"></span>
+      <div class="map-float f1">
+        <div class="ti"><span class="n">1</span> Old Town Core</div>
+        <div class="sub">Historic quarter · 2 min off route</div>
+      </div>
+      <div class="map-float f2">
+        <div class="ti"><span class="n">4</span> Hilltop Viewpoint</div>
+        <div class="sub">Natural landmark · worth the climb</div>
+      </div>
+    </div>
   </div>
+</section>
 
-  <!-- ===================== RIGHT: the map ===================== -->
-  <div id="map"></div>
-  <div id="styleSwitcher">
-    <button class="style-btn active" data-style="streets">Streets</button>
-    <button class="style-btn" data-style="outdoor">Outdoor</button>
-    <button class="style-btn" data-style="satellite">Satellite</button>
+<div class="strip">
+  <div class="wrap">
+    <span><b>Routes</b> from OpenStreetMap</span>
+    <span><b>Stories</b> from Wikipedia</span>
+    <span><b>Maps</b> by MapTiler</span>
+    <span><b>Verdicts</b> from real travelers</span>
   </div>
 </div>
 
-<script>
-/* ================================================================
-   ROADSCOUT — front end + corridor-scan engine, in one file.
-
-   The flow, in four stages (matches the architecture we discussed):
-     1. geocode + route   -> get the road path as a line of coordinates
-     2. corridor scan     -> find POIs near the path, sort by travel order
-     3. detail + rating   -> Wikipedia summary + tap a verdict
-     4. (alerts: native only — not in this web proof)
-
-   Ratings are stored in memory only here (a plain JS object). When you
-   add Supabase later, you swap the two functions saveVerdict()/getTally()
-   for calls to the database and nothing else changes.
-   ================================================================ */
-
-/* ---------- 0. Map setup (MapTiler tiles) ----------
-   We guard this: if the map library failed to load from the CDN
-   (offline, blocked, slow network), the app still works — you just
-   get the list without the visual map, instead of a blank crash. */
-
-// MapTiler API key. To change it, replace the string below.
-// (Public client-side key — fine to expose; restrict it to your domain
-//  in your MapTiler account settings when you go live, to protect quota.)
-const MAPTILER_KEY = 'L0PMr6QA6YPkhSS8n4Sv';
-
-// The three basemap styles offered via the switcher. "hybrid" = satellite + labels.
-const MAP_STYLES = {
-  streets:   `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
-  outdoor:   `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${MAPTILER_KEY}`,
-  satellite: `https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_KEY}`
-};
-let currentStyle = 'streets';   // default
-
-let map = null;
-const mapReady = (typeof maplibregl !== 'undefined');
-if (mapReady) {
-  map = new maplibregl.Map({
-    container: 'map',
-    style: MAP_STYLES[currentStyle],
-    center: [20.45, 44.9],
-    zoom: 7
-  });
-} else {
-  document.getElementById('map').innerHTML =
-    '<div style="display:grid;place-items:center;height:100%;color:#8a7f6d;' +
-    'font-style:italic;padding:30px;text-align:center">Map library didn\'t load ' +
-    '(check your connection) — the stop list below still works.</div>';
-}
-
-/* Turf is required for the scan itself. If it's missing, tell the user clearly. */
-const turfReady = (typeof turf !== 'undefined');
-
-/* ---------- Map style switcher ----------
-   Switching MapLibre's style WIPES any layers/sources we added (routes, pins),
-   so after the new style loads we re-draw whatever's currently on screen. */
-function switchMapStyle(styleName) {
-  if (!mapReady || !map || !MAP_STYLES[styleName]) return;
-  currentStyle = styleName;
-  map.setStyle(MAP_STYLES[styleName]);
-  // once the new style finishes loading, redraw routes + pins
-  map.once('styledata', () => {
-    if (currentRoutes && currentRoutes.length) drawRoutes(currentRoutes);
-    if (currentStops && currentStops.length) drawPins(currentStops);
-  });
-  // update which switcher button looks active
-  document.querySelectorAll('.style-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.style === styleName));
-}
-
-/* ---------- in-memory state ---------- */
-let currentStops = [];          // the scanned POIs, in route order
-let activeStopId = null;
-let currentRoutes = [];         // all alternative routes from OSRM
-let selectedRouteIdx = null;    // which route the user clicked to scan
-let routeWikiLang = null;       // local Wikipedia language for this route (e.g. 'de','sr')
-
-/* =====================================================================
-   SUPABASE — persistent, shared community verdicts
-   ===================================================================== */
-
-// Connection details (publishable key is safe to expose; it only grants what
-// the RLS policies allow, which is just public read + insert on verdicts).
-const SUPABASE_URL  = 'https://alvckuspgkjfxqlxikhl.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_ivjezOdTfRGWGGEuobn_mw_5hnya-Ux';
-
-// Initialize the Supabase client (guarded — if the library failed to load,
-// the app still runs, just without community verdicts).
-const supaReady = (typeof supabase !== 'undefined');
-const supa = supaReady ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
-// Per-device anonymous identifier so we can recognize a user's own verdicts
-// (to highlight them in the UI) without requiring accounts. Generated once
-// per device and saved in localStorage — no signup, no tracking beyond this.
-function getUserToken() {
-  let t = localStorage.getItem('cm_user_token');
-  if (!t) {
-    t = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem('cm_user_token', t);
-  }
-  return t;
-}
-const USER_TOKEN = getUserToken();
-
-// Cache of tallies keyed by place_id, populated by getTally on demand.
-// We don't fetch every place's tally up-front; we fetch on detail open.
-const tallyCache = {};
-
-// distinct colours for up to 3+ routes (selected one gets full opacity)
-const ROUTE_COLORS = ['#b5471f', '#2f6b4f', '#3a5a8c', '#8a5a2b', '#6b3a6b'];
-
-/* ---------- tiny helpers ---------- */
-const $ = id => document.getElementById(id);
-const status = msg => { $('status').textContent = msg; };
-
-/* Accept either "lat,lng" typed directly, or a place name we geocode. */
-async function resolvePlace(text) {
-  const m = text.trim().match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
-  if (m) return { lng: parseFloat(m[2]), lat: parseFloat(m[1]) };
-  // Geocode with the free Nominatim service.
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(text)}`;
-  const r = await fetch(url, { headers: { 'Accept-Language': 'en' } });
-  const j = await r.json();
-  if (!j.length) throw new Error(`Couldn't find "${text}"`);
-  return { lng: parseFloat(j[0].lon), lat: parseFloat(j[0].lat) };
-}
-
-/* Map a 2-letter ISO country code to the Wikipedia language edition most
-   useful there. A code not listed simply falls back to English (always tried).
-   One country -> one default language; multilingual countries get the most
-   broadly useful one. Extend or adjust any line freely. */
-const COUNTRY_TO_WIKILANG = {
-  // Europe
-  rs:'sr', de:'de', at:'de', ch:'de', li:'de', fr:'fr', mc:'fr',
-  it:'it', sm:'it', va:'it', es:'es', ad:'ca', pt:'pt', nl:'nl',
-  be:'nl', lu:'fr', gb:'en', ie:'en', is:'is', no:'no', se:'sv',
-  dk:'da', fi:'fi', ee:'et', lv:'lv', lt:'lt', pl:'pl', cz:'cs',
-  sk:'sk', hu:'hu', si:'sl', hr:'hr', ba:'bs', me:'sr', mk:'mk',
-  al:'sq', gr:'el', bg:'bg', ro:'ro', md:'ro', ua:'uk', by:'be',
-  ru:'ru', tr:'tr', cy:'el', mt:'mt',
-  // Middle East & Central Asia
-  il:'he', sa:'ar', ae:'ar', eg:'ar', jo:'ar', lb:'ar', sy:'ar',
-  iq:'ar', kw:'ar', qa:'ar', om:'ar', ye:'ar', ir:'fa', af:'fa',
-  pk:'ur', kz:'kk', uz:'uz', az:'az', ge:'ka', am:'hy',
-  // South & East Asia
-  in:'hi', bd:'bn', lk:'si', np:'ne', cn:'zh', tw:'zh', hk:'zh',
-  jp:'ja', kr:'ko', th:'th', vn:'vi', kh:'km', la:'lo', mm:'my',
-  my:'ms', id:'id', ph:'tl', sg:'en', mn:'mn',
-  // Africa
-  za:'en', ng:'en', ke:'sw', tz:'sw', et:'am', ma:'ar', tn:'ar',
-  dz:'ar', ly:'ar', sd:'ar', gh:'en', ug:'en',
-  // Americas
-  us:'en', ca:'en', mx:'es', br:'pt', ar:'es', cl:'es', co:'es',
-  pe:'es', ve:'es', ec:'es', bo:'es', py:'es', uy:'es', cu:'es',
-  do:'es', gt:'es', cr:'es', pa:'es', ht:'fr',
-  // Oceania
-  au:'en', nz:'en', fj:'en'
-  // anything not listed -> English fallback (always tried regardless)
-};
-
-/* Reverse-geocode a coordinate to a country code, then pick its Wikipedia
-   language. Returns null if it can't tell (we then just use English). */
-async function detectWikiLang(lng, lat) {
-  try {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json` +
-                `&lat=${lat}&lon=${lng}&zoom=3`;
-    const r = await fetch(url, { headers: { 'Accept-Language': 'en' } });
-    const j = await r.json();
-    const cc = j?.address?.country_code;        // e.g. "de"
-    if (!cc) return null;
-    return COUNTRY_TO_WIKILANG[cc] || null;     // mapped language, or null -> English only
-  } catch {
-    return null;
-  }
-}
-
-/* =====================================================================
-   STAGE 1 — get the route(s). We now ask OSRM for ALTERNATIVES, so it
-   returns up to a few different paths instead of just the best one.
-   Returns an ARRAY of routes; each has .geometry and .distance (metres).
-   Note: OSRM's free engine usually gives 1–3 alternatives, sometimes
-   only one if the roads don't offer a genuinely different path.
-   ===================================================================== */
-async function getRoutes(from, to) {
-  const coords = `${from.lng},${from.lat};${to.lng},${to.lat}`;
-  const url = `https://router.project-osrm.org/route/v1/driving/${coords}` +
-              `?overview=full&geometries=geojson&alternatives=true`;
-  const r = await fetch(url);
-  const j = await r.json();
-  if (!j.routes || !j.routes.length) throw new Error('No route found.');
-  return j.routes;   // array of route objects
-}
-
-/* =====================================================================
-   STAGE 2 — THE CORRIDOR SCAN. This is the heart of the whole thing.
-
-   Steps:
-     a) buffer the route line into a corridor polygon
-     b) ask Overpass for POIs inside the corridor's bounding box
-     c) keep only POIs actually inside the corridor polygon
-     d) for each survivor, find its distance ALONG the route
-        -> that single number gives us travel order + detour distance
-     e) sort by along-route distance
-   ===================================================================== */
-async function corridorScan(routeLine, widthKm, maxDetourKm, maxAttractions) {
-  // (a) build the corridor polygon around the route
-  const corridor = turf.buffer(routeLine, widthKm, { units: 'kilometers' });
-
-  // (b) bounding box for the Overpass query (Overpass searches a box)
-  const [w, s, e, n] = turf.bbox(corridor);
-
-  // The Overpass query: this tag list IS the product. Tune it to taste.
-  // Right now: historic things, viewpoints/museums/attractions, natural peaks & waterfalls.
-  // TIMEOUT 1 (server-side): how long Overpass may spend computing. Raised to 120s
-  // so larger corridors have a chance to finish. Note the public server has its
-  // own internal caps, so very large queries may still be refused regardless.
-  const query = `
-    [out:json][timeout:120];
-    (
-      node["historic"](${s},${w},${n},${e});
-      way["historic"](${s},${w},${n},${e});
-      relation["historic"](${s},${w},${n},${e});
-      node["heritage"](${s},${w},${n},${e});
-      way["heritage"](${s},${w},${n},${e});
-      relation["heritage"](${s},${w},${n},${e});
-      node["tourism"~"viewpoint|museum|attraction|artwork"](${s},${w},${n},${e});
-      way["tourism"~"viewpoint|museum|attraction|artwork"](${s},${w},${n},${e});
-      node["natural"~"peak|waterfall|cave_entrance"](${s},${w},${n},${e});
-    );
-    out center 200;
-  `;
-
-  // TIMEOUT 2 (client-side): fetch() has no timeout by default, so a stalled
-  // request would hang forever. AbortController cancels it after 125s (just
-  // past the server's 120s) so we fail cleanly with a message instead of spinning.
-  const controller = new AbortController();
-  const abortTimer = setTimeout(() => controller.abort(), 125000);
-
-  let j;
-  try {
-    const r = await fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST', body: query, signal: controller.signal
-    });
-    if (!r.ok) throw new Error(`the search was too large (server returned ${r.status}). Try a narrower corridor or a shorter route.`);
-    j = await r.json();
-  } catch (err) {
-    clearTimeout(abortTimer);
-    if (err.name === 'AbortError') {
-      throw new Error('The attraction search timed out — try a shorter route or a narrower corridor width.');
-    }
-    throw new Error('Attraction search failed: ' + err.message);
-  }
-  clearTimeout(abortTimer);
-
-  const totalLen = turf.length(routeLine, { units: 'kilometers' });
-  const results = [];
-
-  for (const el of j.elements) {
-    if (!el.tags || !el.tags.name) continue;            // skip unnamed clutter
-
-    // Nodes have lat/lon directly; ways/relations (buildings) have their
-    // coordinate in el.center (because we used "out center"). Handle both.
-    const lat = el.lat != null ? el.lat : (el.center && el.center.lat);
-    const lon = el.lon != null ? el.lon : (el.center && el.center.lon);
-    if (lat == null || lon == null) continue;           // no usable coordinate
-    const pt = turf.point([lon, lat]);
-
-    // (c) is it really inside the corridor (not just the loose box)?
-    if (!turf.booleanPointInPolygon(pt, corridor)) continue;
-
-    // (d) project onto the route: nearestPointOnLine gives us 'location'
-    //     = distance along the route in km, plus 'dist' = detour distance.
-    const snap = turf.nearestPointOnLine(routeLine, pt, { units: 'kilometers' });
-
-    // (d2) MAX DETOUR FILTER: skip anything farther off the road than the
-    //      user's limit. snap.properties.dist is the straight-line detour in km.
-    if (snap.properties.dist > maxDetourKm) continue;
-
-    results.push({
-      id: `${el.type}/${el.id}`,
-      name: el.tags.name,
-      lat: lat, lng: lon,
-      kind: el.tags.historic || el.tags.heritage || el.tags.tourism || el.tags.natural || 'point of interest',
-      alongKm: snap.properties.location,     // <-- sort key (travel order)
-      detourKm: snap.properties.dist,        // <-- how far off the route
-      progress: snap.properties.location / totalLen,
-      // OSM's precise links to the right article (when a mapper added them).
-      // wikidata is a language-neutral ID (e.g. "Q12345"); wikipedia is like
-      // "en:Park Imperial" (language prefix + exact title). Either one lets us
-      // fetch the CORRECT article instead of guessing by name.
-      wikidata: el.tags.wikidata || null,
-      wikipedia: el.tags.wikipedia || null,
-      // address tags, if present, for display / sanity-checking location
-      addr: [el.tags['addr:housenumber'], el.tags['addr:street'],
-             el.tags['addr:city']].filter(Boolean).join(' ') || null
-    });
-  }
-
-  // (e) sort by position along the route -> the list comes out in travel order
-  results.sort((a, b) => a.alongKm - b.alongKm);
-
-  // light dedup: drop near-identical names within 1km of each other
-  const deduped = [];
-  for (const p of results) {
-    const dup = deduped.find(q => q.name === p.name && Math.abs(q.alongKm - p.alongKm) < 1);
-    if (!dup) deduped.push(p);
-  }
-
-  // (f) NOTABILITY TRIM: if there are more than maxAttractions, keep only the
-  //     most notable ones. "Notable" = has an OSM wikidata/wikipedia link
-  //     (a free, instant signal we already captured). We keep all notable ones
-  //     first; if that's still over the cap, keep the closest-to-route among
-  //     them; if there aren't ENOUGH notable ones (sparse regions), we fill up
-  //     to the cap with the closest-to-route untagged ones, so we never end up
-  //     with too few. Finally we re-sort by travel order for display.
-  if (maxAttractions && deduped.length > maxAttractions) {
-    const notable = deduped.filter(p => p.wikidata || p.wikipedia);
-    const others  = deduped.filter(p => !(p.wikidata || p.wikipedia));
-
-    let kept;
-    if (notable.length >= maxAttractions) {
-      // plenty of notable ones -> keep the closest-to-route notable ones
-      kept = notable.sort((a, b) => a.detourKm - b.detourKm).slice(0, maxAttractions);
-    } else {
-      // not enough notable -> take all notable, fill with closest untagged ones
-      const fill = others.sort((a, b) => a.detourKm - b.detourKm)
-                         .slice(0, maxAttractions - notable.length);
-      kept = notable.concat(fill);
-    }
-    // re-sort the kept set back into travel order so the list reads in sequence
-    kept.sort((a, b) => a.alongKm - b.alongKm);
-    return kept;
-  }
-
-  return deduped;
-}
-
-/* =====================================================================
-   STAGE 3a — enrichment: fetch a short Wikipedia summary + image.
-   Called lazily when the user opens a stop's detail panel.
-
-   TWO-TIER STRATEGY:
-   Tier 1 (RELIABLE): if OSM gave us a precise link — a `wikipedia` tag
-     (e.g. "en:Park Imperial") or a `wikidata` ID (e.g. "Q12345") — follow
-     it to the EXACT correct article. No guessing, no wrong-article bugs.
-   Tier 2 (FALLBACK): if there's no such tag, fall back to name-SEARCH in
-     the local language then English. This is the fuzzy path that can
-     occasionally match the wrong article (the "Park Imperial -> Beijing"
-     problem), so it's only used when we have no precise link.
-   ===================================================================== */
-
-/* Fetch a summary for an EXACT article title in a given language.
-   Also returns the article's own coordinates (when Wikipedia has them),
-   so callers can sanity-check that a searched match is in the right place. */
-async function fetchByTitle(title, lang) {
-  try {
-    const url = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
-    const r = await fetch(url);
-    if (!r.ok) return null;
-    const j = await r.json();
-    if (!j.extract) return null;
-    // Wikipedia's summary includes coordinates for articles about places.
-    const coord = j.coordinates ? { lat: j.coordinates.lat, lng: j.coordinates.lon } : null;
-    return { text: j.extract, img: j.thumbnail ? j.thumbnail.source : null,
-             title: j.title || title, lang, exact: true, coord };
-  } catch { return null; }
-}
-
-/* Resolve a Wikidata ID (e.g. "Q12345") to a Wikipedia article + summary.
-   Wikidata stores sitelinks to every language Wikipedia; we prefer the
-   local language, then English. This is the most precise source of all. */
-async function fetchByWikidata(qid, preferLang) {
-  try {
-    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${encodeURIComponent(qid)}` +
-                `&props=sitelinks&format=json&origin=*`;
-    const r = await fetch(url);
-    const j = await r.json();
-    const links = j?.entities?.[qid]?.sitelinks;
-    if (!links) return null;
-    // try local-language wiki first, then English
-    const order = [];
-    if (preferLang && preferLang !== 'en') order.push(preferLang + 'wiki');
-    order.push('enwiki');
-    for (const key of order) {
-      if (links[key]) {
-        const lang = key.replace('wiki', '');
-        const res = await fetchByTitle(links[key].title, lang);
-        if (res) return res;
-      }
-    }
-    return null;
-  } catch { return null; }
-}
-
-/* Tier 2 fallback: SEARCH one Wikipedia language edition by name and return
-   the top hit. No location check — we accept whatever search finds, which
-   maximizes coverage (lesser-known places, sparsely-tagged regions) at the
-   cost of an occasional wrong-place / wrong-concept match. Tier 1 (OSM tags)
-   remains reliable; this looseness only applies to untagged places. */
-async function fetchFromWiki(name, lang, stopLat, stopLng, maxKm) {
-  try {
-    const searchUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search` +
-      `&srsearch=${encodeURIComponent(name)}&format=json&origin=*&srlimit=1`;
-    const sr = await fetch(searchUrl);
-    const sj = await sr.json();
-    const hit = sj?.query?.search?.[0];
-    if (!hit) return null;
-    const res = await fetchByTitle(hit.title, lang);
-    if (!res) return null;
-    res.exact = false;   // mark as a fuzzy (search) match
-    return res;
-  } catch (e) {
-    console.log(`wiki(${lang}) failed for`, name, e);
-    return null;
-  }
-}
-
-/* Translate text to English using Google Translate's free, KEYLESS endpoint.
-   NOTE: this is an UNOFFICIAL, undocumented endpoint — it works and needs no
-   account, but Google could change or block it at any time, and it may
-   rate-limit under heavy use. Fine for a prototype; for a robust app, switch
-   to a proper translation API (e.g. DeepL free tier) with a key.
-   `from` is the source language code (e.g. 'sr','th','mn'); 'auto' also works. */
-async function translateToEnglish(text, from = 'auto') {
-  try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx` +
-                `&sl=${from}&tl=en&dt=t&q=${encodeURIComponent(text)}`;
-    const r = await fetch(url);
-    if (!r.ok) return null;
-    const j = await r.json();
-    // Response is a nested array; the translated chunks are in j[0], each [translated, original, ...]
-    if (!Array.isArray(j) || !Array.isArray(j[0])) return null;
-    return j[0].map(seg => (seg && seg[0]) ? seg[0] : '').join('');
-  } catch (e) {
-    console.log('translate failed:', e);
-    return null;
-  }
-}
-
-
-/* Main enrichment: takes the whole stop object so it can see OSM tags. */
-async function fetchSummary(stop) {
-  // ---- Tier 1: precise OSM links (reliable, never the wrong place) ----
-  // 1a) wikipedia tag, e.g. "en:Park Imperial" -> split into lang + title
-  if (stop.wikipedia && stop.wikipedia.includes(':')) {
-    const idx = stop.wikipedia.indexOf(':');
-    const lang = stop.wikipedia.slice(0, idx);
-    const title = stop.wikipedia.slice(idx + 1);
-    const res = await fetchByTitle(title, lang);
-    if (res) return res;
-  }
-  // 1b) wikidata ID -> resolve to an article (prefers local language)
-  if (stop.wikidata) {
-    const res = await fetchByWikidata(stop.wikidata, routeWikiLang);
-    if (res) return res;
-  }
-
-  // ---- Tier 2: no precise OSM link -> best-effort name SEARCH.
-  //      Coverage-first: accept whatever search finds (local language first,
-  //      then English), accepting occasional wrong-place / wrong-concept
-  //      matches as the cost of finding lesser-known places. ----
-  if (routeWikiLang && routeWikiLang !== 'en') {
-    const local = await fetchFromWiki(stop.name, routeWikiLang, stop.lat, stop.lng);
-    if (local) return local;
-  }
-  const en = await fetchFromWiki(stop.name, 'en', stop.lat, stop.lng);
-  if (en) return en;
-
-  return null;   // genuinely nothing found -> honest "no description"
-}
-
-/* =====================================================================
-   STAGE 3b — ratings, now backed by Supabase (persistent, shared).
-   These were once the only in-memory placeholders; now they talk to a
-   real database. Everything else in the app is unchanged.
-   ===================================================================== */
-
-/* Save (or update) this device's verdict for a place. If the user clicks
-   a different verdict than they cast before, we DELETE the old one and
-   insert the new — net effect: one verdict per device per place. */
-async function saveVerdict(poiId, verdict) {
-  if (!supaReady || !supa) {
-    console.log('Supabase not ready — verdict not saved.');
-    return;
-  }
-  try {
-    // remove any prior verdict from this device on this place
-    await supa.from('verdicts')
-      .delete()
-      .eq('place_id', poiId)
-      .eq('user_token', USER_TOKEN);
-    // insert the new one
-    const { error } = await supa.from('verdicts').insert({
-      place_id: poiId,
-      verdict: verdict,
-      user_token: USER_TOKEN
-    });
-    if (error) console.log('saveVerdict error:', error.message);
-    // invalidate cached tally so the next read fetches fresh counts
-    delete tallyCache[poiId];
-  } catch (e) {
-    console.log('saveVerdict failed:', e);
-  }
-}
-
-/* Fetch the community tally for a place: counts of good/meh/skip across
-   ALL users, plus what THIS device cast (so we can highlight it). */
-async function getTally(poiId) {
-  // serve from cache if we've fetched it recently in this session
-  if (tallyCache[poiId]) return tallyCache[poiId];
-
-  if (!supaReady || !supa) {
-    return { good: 0, meh: 0, skip: 0, mine: null };
-  }
-  try {
-    const { data, error } = await supa.from('verdicts')
-      .select('verdict, user_token')
-      .eq('place_id', poiId);
-    if (error) {
-      console.log('getTally error:', error.message);
-      return { good: 0, meh: 0, skip: 0, mine: null };
-    }
-    let good = 0, meh = 0, skip = 0, mine = null;
-    for (const row of (data || [])) {
-      if (row.verdict === 'good') good++;
-      else if (row.verdict === 'meh') meh++;
-      else if (row.verdict === 'skip') skip++;
-      if (row.user_token === USER_TOKEN) mine = row.verdict;
-    }
-    const tally = { good, meh, skip, mine };
-    tallyCache[poiId] = tally;
-    return tally;
-  } catch (e) {
-    console.log('getTally failed:', e);
-    return { good: 0, meh: 0, skip: 0, mine: null };
-  }
-}
-
-/* =====================================================================
-   RENDERING — draw the alternative routes (coloured, clickable), then
-   draw pins for whichever route the user selects.
-   ===================================================================== */
-
-/* Draw ALL alternative routes, each in its own colour. Clicking a route
-   (on the map) selects it and triggers the scan. The selected route is
-   drawn bold/opaque; the others are dimmed so the choice is clear. */
-function drawRoutes(routes) {
-  if (!mapReady || !map) return;
-
-  // MapLibre can't add layers until the style has loaded. If we're called
-  // too early (user scanned the instant the page opened), wait and retry.
-  if (!map.isStyleLoaded()) {
-    map.once('load', () => drawRoutes(routes));
-    return;
-  }
-
-  // remove any previous route layers/sources
-  routes.forEach((_, i) => {
-    if (map.getLayer('route-' + i)) map.removeLayer('route-' + i);
-    if (map.getLayer('route-hit-' + i)) map.removeLayer('route-hit-' + i);
-    if (map.getSource('route-' + i)) map.removeSource('route-' + i);
-  });
-
-  routes.forEach((route, i) => {
-    const selected = (i === selectedRouteIdx);
-    map.addSource('route-' + i, { type: 'geojson', data: route.geometry });
-
-    // a fat invisible "hit" line on top makes routes easy to click
-    map.addLayer({
-      id: 'route-hit-' + i, type: 'line', source: 'route-' + i,
-      paint: { 'line-color': '#000', 'line-opacity': 0, 'line-width': 22 }
-    });
-    // the visible coloured line
-    map.addLayer({
-      id: 'route-' + i, type: 'line', source: 'route-' + i,
-      paint: {
-        'line-color': ROUTE_COLORS[i % ROUTE_COLORS.length],
-        'line-width': selected ? 6 : 4,
-        'line-opacity': (selectedRouteIdx === null || selected) ? 1 : 0.35
-      }
-    });
-
-    // click handler -> select & scan this route
-    map.on('click', 'route-hit-' + i, () => selectRoute(i));
-    map.on('mouseenter', 'route-hit-' + i, () => map.getCanvas().style.cursor = 'pointer');
-    map.on('mouseleave', 'route-hit-' + i, () => map.getCanvas().style.cursor = '');
-  });
-
-  // fit map to the first route's bounds
-  const [w, s, e, n] = turf.bbox(routes[0].geometry);
-  map.fitBounds([[w, s], [e, n]], { padding: 50 });
-}
-
-/* Draw the numbered POI pins for the currently scanned route. */
-function drawPins(stops) {
-  if (!mapReady || !map) return;
-  document.querySelectorAll('.maplibregl-marker').forEach(m => m.remove());
-  stops.forEach((s, i) => {
-    const el = document.createElement('div');
-    el.style.cssText = 'width:22px;height:22px;border-radius:50%;background:#2f6b4f;' +
-      'color:#fff;font:700 11px sans-serif;display:grid;place-items:center;cursor:pointer;' +
-      'border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)';
-    el.textContent = i + 1;
-    // native hover tooltip (desktop only — no-op on mobile, which is correct)
-    el.title = `${i + 1}. ${s.name}`;
-    el.onclick = () => openDetail(s.id);
-    new maplibregl.Marker({ element: el }).setLngLat([s.lng, s.lat]).addTo(map);
-  });
-}
-
-function renderList(stops) {
-  const ul = $('stops');
-  ul.innerHTML = '';
-  $('empty').style.display = stops.length ? 'none' : 'block';
-  stops.forEach((s, i) => {
-    const li = document.createElement('li');
-    li.className = 'stop';
-    li.dataset.id = s.id;
-    li.innerHTML = `
-      <span class="seq">${i+1}</span>
-      <h3>${s.name}</h3>
-      <div class="meta">${s.alongKm.toFixed(0)} km into the trip · ${(s.detourKm*1000).toFixed(0)} m off route</div>
-      <span class="kind">${s.kind}</span>`;
-    li.onclick = () => openDetail(s.id);
-    ul.appendChild(li);
-  });
-}
-
-async function openDetail(poiId) {
-  activeStopId = poiId;
-  const s = currentStops.find(x => x.id === poiId);
-  const num = currentStops.findIndex(x => x.id === poiId) + 1;  // its position in the list
-  document.querySelectorAll('.stop').forEach(el =>
-    el.classList.toggle('active', el.dataset.id === poiId));
-
-  const body = $('detailBody');
-  body.innerHTML = `<h2><span class="num-badge">${num}</span> ${s.name}</h2>
-    <div class="meta" style="color:var(--muted);font-size:13px">
-      ${s.kind} · ${s.alongKm.toFixed(0)} km in · ${(s.detourKm*1000).toFixed(0)} m detour</div>
-    <div class="summary">Loading description…</div>`;
-  $('detail').classList.add('open');
-
-  // enrichment (Wikipedia) — pass the whole stop so it can use OSM tags
-  const info = await fetchSummary(s);
-  const t = await getTally(poiId);
-  const addrLine = s.addr ? `<div class="meta" style="color:var(--muted);font-size:12px;margin-top:2px">📍 ${s.addr}</div>` : '';
-  const descHtml = info && info.text
-    ? info.text
-    : 'No description found for this place.';
-  // Show a translate button only when we have a description that isn't English.
-  const showTranslate = info && info.text && info.lang && info.lang !== 'en';
-  const translateBtn = showTranslate
-    ? `<button id="translateBtn" style="margin-top:8px;padding:6px 12px;font:inherit;font-size:13px;
-         border:1px solid var(--rule);border-radius:6px;background:#fff;cursor:pointer">
-         🌐 Translate to English (${info.lang})</button>`
-    : '';
-  body.innerHTML = `
-    <h2 id="titleText"><span class="num-badge">${num}</span> ${s.name}</h2>
-    <div class="meta" style="color:var(--muted);font-size:13px">
-      ${s.kind} · ${s.alongKm.toFixed(0)} km in · ${(s.detourKm*1000).toFixed(0)} m detour</div>
-    ${addrLine}
-    ${info && info.img ? `<img src="${info.img}" alt="">` : ''}
-    <div class="summary" id="summaryText">${descHtml}</div>
-    ${translateBtn}
-
-    <div class="verdict-q">Did you stop here? Your verdict:</div>
-    <div class="verdicts">
-      <button id="v-good" class="${t.mine==='good'?'sel-good':''}">Worth it</button>
-      <button id="v-meh"  class="${t.mine==='meh' ?'sel-meh' :''}">Meh</button>
-      <button id="v-skip" class="${t.mine==='skip'?'sel-skip':''}">Skip it</button>
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Three steps to a richer drive</h2>
+      <p>Plan before you go. Cultural Map does the scouting so you arrive knowing exactly what's worth a stop.</p>
     </div>
-    <div class="tally">Community: <b>${t.good}</b> worth it · <b>${t.meh}</b> meh · <b>${t.skip}</b> skip
-      <br><span style="font-size:11px">(shared across all visitors — your verdict is saved)</span></div>`;
+    <div class="steps">
+      <div class="step reveal">
+        <div class="num">1</div>
+        <h3>Enter your route</h3>
+        <p>Type where you're starting and where you're headed. Cultural Map maps the drive and the routes you could take.</p>
+      </div>
+      <div class="step reveal">
+        <div class="num">2</div>
+        <h3>Scan the corridor</h3>
+        <p>It searches a corridor along your route for cultural attractions, in the order you'll reach them — with distance and detour for each.</p>
+      </div>
+      <div class="step reveal">
+        <div class="num">3</div>
+        <h3>Choose your stops</h3>
+        <p>Read a short description of each place, in the local language or translated to English, and pick the ones worth your time.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-  // Translate button handler: translates BOTH the title and the description.
-  if (showTranslate) {
-    $('translateBtn').onclick = async () => {
-      const btn = $('translateBtn');
-      btn.textContent = 'Translating…';
-      btn.disabled = true;
-      // translate title and description in parallel for speed
-      const [tTitle, tDesc] = await Promise.all([
-        translateToEnglish(s.name, info.lang),
-        translateToEnglish(info.text, info.lang)
-      ]);
-      if (tDesc) $('summaryText').textContent = tDesc;
-      if (tTitle) $('titleText').innerHTML = `<span class="num-badge">${num}</span> ${tTitle}`;
-      if (tDesc || tTitle) {
-        btn.textContent = '✓ Translated to English';
-      } else {
-        btn.textContent = '⚠ Translation failed — try again';
-        btn.disabled = false;
-      }
-    };
-  }
+<!-- FEATURES -->
+<section class="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Built for the curious traveler</h2>
+      <p>Most trip planners show you the famous stuff. Cultural Map finds what others miss.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal"><div class="ic">🌍</div><div><h3>Works worldwide</h3><p>From Serbia to Thailand to the American West — if there's a road, Cultural Map scouts it.</p></div></div>
+      <div class="feat reveal"><div class="ic">🗣️</div><div><h3>In your language</h3><p>Descriptions appear in the local language of each place, with one tap to translate to English.</p></div></div>
+      <div class="feat reveal"><div class="ic">💎</div><div><h3>Finds hidden gems</h3><p>Not just the headline sights — the quirky monuments, small museums, and overlooked landmarks worth pulling over for.</p></div></div>
+      <div class="feat reveal"><div class="ic">⭐</div><div><h3>Real verdicts</h3><p>Travelers rate each place — worth it, meh, or skip — so you benefit from those who stopped before you.</p></div></div>
+      <div class="feat reveal"><div class="ic">🎚️</div><div><h3>You're in control</h3><p>Tune how far off-route you'll go and how many stops to see. Your trip, your pace.</p></div></div>
+      <div class="feat reveal"><div class="ic">🆓</div><div><h3>Free, no account</h3><p>Open it and go. No sign-up, no cost, nothing to install.</p></div></div>
+    </div>
+  </div>
+</section>
 
-    $('v-good').onclick = async () => { await saveVerdict(poiId,'good'); openDetail(poiId); };
-    $('v-meh').onclick  = async () => { await saveVerdict(poiId,'meh');  openDetail(poiId); };
-    $('v-skip').onclick = async () => { await saveVerdict(poiId,'skip'); openDetail(poiId); };
-}
+<!-- STORY -->
+<section class="story">
+  <div class="wrap reveal">
+    <h2>Why I built this</h2>
+    <p>Every trip planner I tried showed me the same handful of famous places — and nothing of the strange, wonderful, lesser-known spots that make a drive memorable. So I built the tool I wanted: one that scouts the whole route, in any country, in any language, and surfaces the places worth pulling over for.</p>
+    <p>It's free, it's a labour of love, and it gets better every time someone uses it.</p>
+    <div class="sig">— Miloš Savić</div>
+  </div>
+</section>
 
-$('back').onclick = () => {
-  $('detail').classList.remove('open');   // hide detail -> list reappears
-  $('detail').scrollTop = 0;              // reset scroll for next time
-};
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="wrap">
+    <div class="final-card reveal">
+      <h2>Your next drive has more to offer than you think.</h2>
+      <p>Enter a route and see what's waiting along the way.</p>
+      <a class="btn btn-primary" href="https://milossavicgit.github.io/cultural-map/">Open Cultural Map →</a>
+    </div>
+  </div>
+</section>
 
-/* Wire up the map style switcher buttons */
-document.querySelectorAll('.style-btn').forEach(btn => {
-  btn.onclick = () => switchMapStyle(btn.dataset.style);
-});
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot">↗</span> Cultural Map</div>
+    <p>An independent project by Miloš Savić · Built with open data from OpenStreetMap &amp; Wikipedia</p>
+    <p style="margin-top:8px"><a href="https://milossavicgit.github.io/cultural-map/">Open the app</a></p>
+  </div>
+</footer>
 
-/* =====================================================================
-   selectRoute — called when the user clicks one of the coloured routes.
-   It highlights that route and scans ONLY it for cultural attractions.
-   ===================================================================== */
-async function selectRoute(idx) {
-  selectedRouteIdx = idx;
-  const route = currentRoutes[idx];
-
-  // redraw routes so the chosen one is bold and the others dim
-  drawRoutes(currentRoutes);
-
-  const km = (route.distance / 1000).toFixed(0);
-  status(`Scanning route ${idx + 1} (${km} km) for cultural attractions…`);
-  $('stops').innerHTML = '';
-  $('detail').classList.remove('open');
-
-  try {
-    // Detect the local Wikipedia language from the MIDPOINT of this route.
-    // turf.along finds the point at half the route's length. We then reverse-
-    // geocode it to a country and map that to a Wikipedia language.
-    const mid = turf.along(route.geometry, turf.length(route.geometry) / 2, { units: 'kilometers' });
-    const [mLng, mLat] = mid.geometry.coordinates;
-    routeWikiLang = await detectWikiLang(mLng, mLat);
-    if (routeWikiLang) status(`Route ${idx + 1}: local language detected (${routeWikiLang}). Scanning…`);
-
-    const widthKm = parseFloat($('width').value) || 1;
-    const maxDetourKm = parseFloat($('maxDetour').value) || 2;
-    const maxAttractions = parseInt($('maxAttractions').value) || 200;
-    currentStops = await corridorScan(route.geometry, widthKm, maxDetourKm, maxAttractions);
-    const langNote = routeWikiLang ? ` · descriptions: ${routeWikiLang}/en` : '';
-    status(`Route ${idx + 1}: found ${currentStops.length} stops along the way${langNote}.`);
-    drawPins(currentStops);
-    renderList(currentStops);
-  } catch (e) {
-    status('⚠ ' + e.message);
-  }
-}
-
-/* =====================================================================
-   MAIN — fetch the alternative routes and display them. The scan no
-   longer happens automatically; it waits for the user to click a route.
-   ===================================================================== */
-$('go').onclick = async () => {
-  if (!turfReady) {
-    status('⚠ The geometry library (Turf) failed to load — check your connection and refresh.');
-    return;
-  }
-  const btn = $('go');
-  btn.disabled = true;
-  $('stops').innerHTML = '';
-  selectedRouteIdx = null;
-  currentStops = [];
-  routeWikiLang = null;   // reset; will be re-detected for the chosen route
-  try {
-    status('Finding start and destination…');
-    const from = await resolvePlace($('from').value);
-    const to   = await resolvePlace($('to').value);
-
-    status('Calculating routes…');
-    currentRoutes = await getRoutes(from, to);
-
-    drawRoutes(currentRoutes);
-
-    if (currentRoutes.length === 1) {
-      // only one path exists — just scan it, no need to choose
-      status('Only one route found — scanning it…');
-      await selectRoute(0);
-    } else {
-      // show the choice and let the user pick
-      $('empty').style.display = 'block';
-      const lines = currentRoutes.map((r, i) =>
-        `Route ${i + 1}: ${(r.distance / 1000).toFixed(0)} km`).join('  ·  ');
-      status(`Found ${currentRoutes.length} routes — ${lines}. Click a coloured route on the map to scan it.`);
-      $('empty').textContent = 'Click one of the coloured routes on the map to find its cultural attractions.';
-    }
-  } catch (e) {
-    status('⚠ ' + e.message);
-  } finally {
-    btn.disabled = false;
-  }
-};
+<script>
+  // gentle scroll-reveal
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.14 });
+  document.querySelectorAll('.reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i % 3) * 0.08 + 's';
+    obs.observe(el);
+  });
 </script>
 </body>
 </html>
