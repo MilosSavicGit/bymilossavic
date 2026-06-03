@@ -1,355 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="msvalidate.01" content="838BF69BCE51D0CD2113489AC4892820" />
-<title>Cultural Map — find the stops worth making</title>
-<meta name="description" content="Cultural Map scans your driving route for cultural attractions worth stopping for — monuments, museums, viewpoints, hidden gems — listed in the order you'll reach them. Free, worldwide, in your language.">
-
-<!-- Open Graph / social preview -->
-<meta property="og:title" content="Cultural Map — find the stops worth making">
-<meta property="og:description" content="Scan any driving route for cultural attractions worth stopping for. Free, worldwide, in your language.">
-<meta property="og:type" content="website">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Spline+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-
-<style>
-  :root {
-    --paper:    #f6f1e7;
-    --paper-2:  #efe7d6;
-    --ink:      #2a2118;
-    --muted:    #6f6452;
-    --accent:   #b5471f;   /* terracotta */
-    --accent-2: #2f6b4f;   /* pine green  */
-    --rule:     #ddd1bb;
-    --shadow:   rgba(60, 40, 20, 0.13);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'Spline Sans', system-ui, sans-serif;
-    color: var(--ink);
-    background: var(--paper);
-    line-height: 1.6;
-    overflow-x: hidden;
-    /* subtle paper grain */
-    background-image:
-      radial-gradient(circle at 15% 20%, rgba(181,71,31,0.04), transparent 40%),
-      radial-gradient(circle at 85% 70%, rgba(47,107,79,0.05), transparent 45%);
-  }
-
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
-
-  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line-height: 1.1; }
-
-  a { color: inherit; }
-
-  /* ---------- top bar ---------- */
-  header {
-    padding: 26px 0;
-    position: relative;
-    z-index: 5;
-  }
-  .bar { display: flex; align-items: center; justify-content: space-between; }
-  .brand {
-    font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px;
-    letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px;
-  }
-  .brand .dot {
-    width: 26px; height: 26px; border-radius: 50%;
-    background: var(--accent); display: inline-grid; place-items: center;
-    color: #fff; font-size: 14px; transform: rotate(-8deg);
-  }
-  .brand small { font-family: 'Spline Sans', sans-serif; font-weight: 400;
-    font-size: 12px; color: var(--muted); margin-left: 2px; }
-  .nav-cta {
-    font-size: 14px; font-weight: 600; text-decoration: none;
-    background: var(--ink); color: var(--paper);
-    padding: 9px 17px; border-radius: 100px; transition: transform .15s, background .15s;
-  }
-  .nav-cta:hover { transform: translateY(-1px); background: var(--accent); }
-
-  /* ---------- hero ---------- */
-  .hero { padding: 48px 0 30px; position: relative; }
-  .hero-grid {
-    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 50px; align-items: center;
-  }
-  .eyebrow {
-    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--accent-2);
-    border: 1px solid var(--rule); border-radius: 100px; padding: 5px 14px;
-    margin-bottom: 22px; background: rgba(255,255,255,0.5);
-  }
-  .hero h1 {
-    font-size: clamp(40px, 6vw, 68px); letter-spacing: -0.02em; margin-bottom: 20px;
-  }
-  .hero h1 .em { color: var(--accent); font-style: italic; font-weight: 500; }
-  .lede { font-size: clamp(17px, 2.2vw, 20px); color: var(--muted); max-width: 30em; margin-bottom: 30px; }
-  .cta-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-  .btn {
-    font: inherit; font-weight: 600; font-size: 16px; text-decoration: none;
-    padding: 14px 26px; border-radius: 100px; cursor: pointer; transition: transform .15s, box-shadow .15s;
-    display: inline-flex; align-items: center; gap: 9px;
-  }
-  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 8px 22px rgba(181,71,31,0.28); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(181,71,31,0.36); }
-  .btn-ghost { color: var(--ink); border: 1.5px solid var(--rule); background: rgba(255,255,255,0.4); }
-  .btn-ghost:hover { border-color: var(--ink); transform: translateY(-2px); }
-  .free-note { font-size: 13px; color: var(--muted); margin-top: 14px; }
-
-  /* ---------- hero visual: stylized map card ---------- */
-  .map-card {
-    position: relative; aspect-ratio: 4/5; border-radius: 22px; overflow: hidden;
-    background: linear-gradient(160deg, #e9e0cd, #dccfb3);
-    box-shadow: 0 26px 60px var(--shadow); border: 1px solid rgba(255,255,255,0.5);
-    transform: rotate(1.4deg);
-  }
-  .map-card svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .map-float {
-    position: absolute; background: var(--paper); border-radius: 13px;
-    box-shadow: 0 10px 26px var(--shadow); padding: 11px 13px; width: 200px;
-    border: 1px solid var(--rule);
-  }
-  .map-float .ti { font-family:'Fraunces',serif; font-weight: 600; font-size: 14.5px; display:flex; gap:7px; align-items:center;}
-  .map-float .ti .n { background: var(--accent-2); color:#fff; width:20px; height:20px; border-radius:50%;
-    display:inline-grid; place-items:center; font-size:11px; font-family:'Spline Sans',sans-serif; flex:none;}
-  .map-float .sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; padding-left: 27px; }
-  .f1 { top: 12%; left: 8%; }
-  .f2 { bottom: 14%; right: 7%; }
-  .pin { position:absolute; width:26px; height:26px; border-radius:50% 50% 50% 0;
-    background:var(--accent); transform: rotate(-45deg); box-shadow:0 4px 10px rgba(0,0,0,.25);}
-  .pin::after{content:''; position:absolute; inset:7px; background:var(--paper); border-radius:50%;}
-  .pin.p1{ top:30%; left:42%;} .pin.p2{ top:54%; left:58%; background:var(--accent-2);} .pin.p3{ top:72%; left:34%;}
-
-  /* ---------- strip ---------- */
-  .strip { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
-    margin-top: 44px; padding: 18px 0; background: rgba(255,255,255,0.35); }
-  .strip .wrap { display: flex; gap: 38px; flex-wrap: wrap; justify-content: center;
-    font-size: 14.5px; color: var(--muted); }
-  .strip b { color: var(--ink); font-weight: 600; }
-
-  /* ---------- how it works ---------- */
-  section { padding: 78px 0; }
-  .sec-head { text-align: center; margin-bottom: 52px; }
-  .sec-head h2 { font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.02em; margin-bottom: 12px; }
-  .sec-head p { color: var(--muted); font-size: 17px; max-width: 34em; margin: 0 auto; }
-
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
-  .step {
-    background: rgba(255,255,255,0.55); border: 1px solid var(--rule); border-radius: 18px;
-    padding: 30px 26px; position: relative; transition: transform .18s, box-shadow .18s;
-  }
-  .step:hover { transform: translateY(-4px); box-shadow: 0 16px 34px var(--shadow); }
-  .step .num {
-    font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #fff;
-    background: var(--accent); width: 34px; height: 34px; border-radius: 50%;
-    display: grid; place-items: center; margin-bottom: 18px;
-  }
-  .step:nth-child(2) .num { background: var(--accent-2); }
-  .step:nth-child(3) .num { background: var(--ink); }
-  .step h3 { font-size: 21px; margin-bottom: 9px; }
-  .step p { color: var(--muted); font-size: 15px; }
-
-  /* ---------- features ---------- */
-  .features { background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-  .feat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 40px; }
-  .feat { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; }
-  .feat .ic {
-    flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--paper);
-    border: 1px solid var(--rule); display: grid; place-items: center; font-size: 20px;
-  }
-  .feat h3 { font-size: 18px; margin-bottom: 4px; }
-  .feat p { color: var(--muted); font-size: 14.5px; }
-
-  /* ---------- story ---------- */
-  .story .wrap { max-width: 720px; text-align: center; }
-  .story h2 { font-size: clamp(28px, 3.6vw, 38px); margin-bottom: 22px; letter-spacing: -0.02em; }
-  .story p { font-size: 18px; color: var(--ink); margin-bottom: 18px; }
-  .story .sig { font-family: 'Fraunces', serif; font-style: italic; font-size: 19px; color: var(--accent); margin-top: 10px; }
-
-  /* ---------- final CTA ---------- */
-  .final { text-align: center; }
-  .final-card {
-    background: var(--ink); color: var(--paper); border-radius: 26px;
-    padding: 64px 40px; position: relative; overflow: hidden;
-  }
-  .final-card::before {
-    content:''; position:absolute; inset:0;
-    background: radial-gradient(circle at 20% 0%, rgba(181,71,31,0.4), transparent 50%),
-                radial-gradient(circle at 90% 100%, rgba(47,107,79,0.35), transparent 50%);
-  }
-  .final-card > * { position: relative; }
-  .final-card h2 { font-size: clamp(30px, 4.5vw, 46px); margin-bottom: 16px; letter-spacing:-0.02em; }
-  .final-card p { color: rgba(246,241,231,0.78); font-size: 18px; margin-bottom: 30px; max-width: 30em; margin-left:auto; margin-right:auto;}
-  .final-card .btn-primary { background: var(--paper); color: var(--ink); box-shadow: 0 8px 22px rgba(0,0,0,0.3); }
-  .final-card .btn-primary:hover { background: #fff; }
-
-  /* ---------- footer ---------- */
-  footer { padding: 40px 0 56px; text-align: center; color: var(--muted); font-size: 14px; }
-  footer .brand { justify-content: center; font-size: 18px; margin-bottom: 12px; }
-  footer a { color: var(--accent); text-decoration: none; }
-
-  /* reveal animation */
-  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
-  .reveal.in { opacity: 1; transform: none; }
-
-  @media (max-width: 860px) {
-    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
-    .map-card { max-width: 360px; margin: 0 auto; transform: none; }
-    .steps { grid-template-columns: 1fr; }
-    .feat-grid { grid-template-columns: 1fr; }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Miloš Savić | Tools for Discovery</title>
+  <meta name="description" content="Miloš Savić builds practical tools for discovery, maps, open data, geographic exploration and artificial intelligence.">
+  <style>
+    :root {
+      --paper: #f6f1e7;
+      --paper-2: #efe7d6;
+      --ink: #2a2118;
+      --muted: #6f6452;
+      --accent: #b5471f;
+      --accent-2: #2f6b4f;
+      --rule: #ddd1bb;
+      --shadow: rgba(60, 40, 20, 0.13);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height:1.6;
+    }
+    .wrap { max-width:1080px; margin:0 auto; padding:0 28px; }
+    header { padding:28px 0; border-bottom:1px solid var(--rule); }
+    .brand { font-size:22px; font-weight:700; }
+    .hero { padding:90px 0 60px; text-align:center; }
+    .eyebrow {
+      display:inline-block; padding:6px 14px; border:1px solid var(--rule);
+      border-radius:999px; margin-bottom:22px; color:var(--accent-2);
+      font-size:13px; font-weight:700;
+    }
+    h1 { font-size:clamp(42px,7vw,76px); margin-bottom:22px; }
+    .hero p { max-width:720px; margin:0 auto; color:var(--muted); font-size:20px; }
+    .projects { padding:40px 0 90px; }
+    .section-title { text-align:center; font-size:34px; margin-bottom:34px; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .card {
+      background:rgba(255,255,255,0.55);
+      border:1px solid var(--rule);
+      border-radius:22px;
+      padding:30px;
+      min-height:340px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .icon { font-size:40px; margin-bottom:18px; }
+    .status {
+      display:inline-block; margin-bottom:16px; padding:5px 11px;
+      border-radius:999px; font-size:12px; font-weight:700;
+      background:rgba(47,107,79,0.13); color:var(--accent-2);
+    }
+    .soon { background:rgba(181,71,31,0.12); color:var(--accent); }
+    .future { background:rgba(42,33,24,0.1); color:var(--ink); }
+    .button {
+      display:inline-block; padding:13px 20px; border-radius:999px;
+      background:var(--accent); color:white; text-decoration:none;
+      font-weight:700; text-align:center;
+    }
+    .disabled { background:#bbb; color:white; }
+    .about {
+      padding:70px 0; background:var(--paper-2);
+      border-top:1px solid var(--rule);
+      border-bottom:1px solid var(--rule);
+      text-align:center;
+    }
+    footer { padding:34px 0; text-align:center; color:var(--muted); }
+    @media(max-width:850px){
+      .grid{grid-template-columns:1fr;}
+    }
+  </style>
 </head>
 <body>
-
 <header>
-  <div class="wrap bar">
-    <div class="brand"><span class="dot">↗</span> Cultural Map <small>by Miloš Savić</small></div>
-    <a class="nav-cta" href="https://milossavicgit.github.io/cultural-map/">Open the app</a>
-  </div>
+  <div class="wrap"><div class="brand">Miloš Savić</div></div>
 </header>
 
-<!-- HERO -->
 <section class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <span class="eyebrow">Free · Worldwide · In your language</span>
-      <h1>Find the stops <span class="em">worth making.</span></h1>
-      <p class="lede">Cultural Map scans your driving route for cultural attractions worth stopping for — monuments, museums, viewpoints, quiet hidden gems — listed in the order you'll reach them.</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://milossavicgit.github.io/cultural-map/">Plan a route →</a>
-        <a class="btn btn-ghost" href="#how">See how it works</a>
-      </div>
-      <p class="free-note">No account. No cost. Works almost anywhere in the world.</p>
-    </div>
+  <div class="wrap">
+    <div class="eyebrow">Building tools for discovery</div>
+    <h1>Maps, open data and AI tools.</h1>
+    <p>Practical projects for exploring places, information and patterns that are often hidden from traditional search.</p>
+  </div>
+</section>
 
-    <!-- stylized map illustration -->
-    <div class="map-card">
-      <svg viewBox="0 0 400 500" preserveAspectRatio="none" aria-hidden="true">
-        <!-- soft land blocks -->
-        <rect x="0" y="0" width="400" height="500" fill="#e4dac2"/>
-        <path d="M-20,120 Q120,90 260,150 T440,140 L440,-20 L-20,-20 Z" fill="#dcd0b0" opacity="0.7"/>
-        <path d="M-20,400 Q140,360 280,420 T440,400 L440,520 L-20,520 Z" fill="#d2e0cf" opacity="0.6"/>
-        <!-- route line -->
-        <path d="M70,460 C120,360 220,360 230,260 C238,180 150,150 200,60"
-              fill="none" stroke="#b5471f" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 13" opacity="0.9"/>
-        <path d="M70,460 C120,360 220,360 230,260 C238,180 150,150 200,60"
-              fill="none" stroke="#b5471f" stroke-width="5" stroke-linecap="round" opacity="0.18"/>
-      </svg>
-      <span class="pin p1"></span>
-      <span class="pin p2"></span>
-      <span class="pin p3"></span>
-      <div class="map-float f1">
-        <div class="ti"><span class="n">1</span> Old Town Core</div>
-        <div class="sub">Historic quarter · 2 min off route</div>
-      </div>
-      <div class="map-float f2">
-        <div class="ti"><span class="n">4</span> Hilltop Viewpoint</div>
-        <div class="sub">Natural landmark · worth the climb</div>
-      </div>
+<section class="projects">
+  <div class="wrap">
+    <h2 class="section-title">Projects</h2>
+    <div class="grid">
+
+      <article class="card">
+        <div>
+          <div class="icon">🗺️</div>
+          <h2>RoadScout</h2>
+          <span class="status">Active</span>
+          <p>Find attractions, cultural sites, landmarks and hidden places around you or along your route.</p>
+        </div>
+        <a class="button" href="https://milossavicgit.github.io/cultural-map/">Open RoadScout</a>
+      </article>
+
+      <article class="card">
+        <div>
+          <div class="icon">🏖️</div>
+          <h2>Naturist Beach Explorer</h2>
+          <span class="status soon">In Development</span>
+          <p>A future map-based guide to official and customary naturist beaches using public geographic data.</p>
+        </div>
+        <span class="button disabled">Coming Soon</span>
+      </article>
+
+      <article class="card">
+        <div>
+          <div class="icon">🚧</div>
+          <h2>Future RoadScout Features</h2>
+          <span class="status future">Planned</span>
+          <p>User-submitted places, photo uploads, community verification and image moderation.</p>
+        </div>
+        <span class="button disabled">Planned</span>
+      </article>
+
     </div>
   </div>
 </section>
 
-<div class="strip">
+<section class="about">
   <div class="wrap">
-    <span><b>Routes</b> from OpenStreetMap</span>
-    <span><b>Stories</b> from Wikipedia</span>
-    <span><b>Maps</b> by MapTiler</span>
-    <span><b>Verdicts</b> from real travelers</span>
-  </div>
-</div>
-
-<!-- HOW IT WORKS -->
-<section id="how">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2>Three steps to a richer drive</h2>
-      <p>Plan before you go. Cultural Map does the scouting so you arrive knowing exactly what's worth a stop.</p>
-    </div>
-    <div class="steps">
-      <div class="step reveal">
-        <div class="num">1</div>
-        <h3>Enter your route</h3>
-        <p>Type where you're starting and where you're headed. Cultural Map maps the drive and the routes you could take.</p>
-      </div>
-      <div class="step reveal">
-        <div class="num">2</div>
-        <h3>Scan the corridor</h3>
-        <p>It searches a corridor along your route for cultural attractions, in the order you'll reach them — with distance and detour for each.</p>
-      </div>
-      <div class="step reveal">
-        <div class="num">3</div>
-        <h3>Choose your stops</h3>
-        <p>Read a short description of each place, in the local language or translated to English, and pick the ones worth your time.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="features">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2>Built for the curious traveler</h2>
-      <p>Most trip planners show you the famous stuff. Cultural Map finds what others miss.</p>
-    </div>
-    <div class="feat-grid">
-      <div class="feat reveal"><div class="ic">🌍</div><div><h3>Works worldwide</h3><p>From Serbia to Thailand to the American West — if there's a road, Cultural Map scouts it.</p></div></div>
-      <div class="feat reveal"><div class="ic">🗣️</div><div><h3>In your language</h3><p>Descriptions appear in the local language of each place, with one tap to translate to English.</p></div></div>
-      <div class="feat reveal"><div class="ic">💎</div><div><h3>Finds hidden gems</h3><p>Not just the headline sights — the quirky monuments, small museums, and overlooked landmarks worth pulling over for.</p></div></div>
-      <div class="feat reveal"><div class="ic">⭐</div><div><h3>Real verdicts</h3><p>Travelers rate each place — worth it, meh, or skip — so you benefit from those who stopped before you.</p></div></div>
-      <div class="feat reveal"><div class="ic">🎚️</div><div><h3>You're in control</h3><p>Tune how far off-route you'll go and how many stops to see. Your trip, your pace.</p></div></div>
-      <div class="feat reveal"><div class="ic">🆓</div><div><h3>Free, no account</h3><p>Open it and go. No sign-up, no cost, nothing to install.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- STORY -->
-<section class="story">
-  <div class="wrap reveal">
-    <h2>Why I built this</h2>
-    <p>Every trip planner I tried showed me the same handful of famous places — and nothing of the strange, wonderful, lesser-known spots that make a drive memorable. So I built the tool I wanted: one that scouts the whole route, in any country, in any language, and surfaces the places worth pulling over for.</p>
-    <p>It's free, it's a labour of love, and it gets better every time someone uses it.</p>
-    <div class="sig">— Miloš Savić</div>
-  </div>
-</section>
-
-<!-- FINAL CTA -->
-<section class="final">
-  <div class="wrap">
-    <div class="final-card reveal">
-      <h2>Your next drive has more to offer than you think.</h2>
-      <p>Enter a route and see what's waiting along the way.</p>
-      <a class="btn btn-primary" href="https://milossavicgit.github.io/cultural-map/">Open Cultural Map →</a>
-    </div>
+    <h2>About</h2>
+    <p>I am an independent builder from Serbia interested in maps, travel, open data and practical AI applications.</p>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">
-    <div class="brand"><span class="dot">↗</span> Cultural Map</div>
-    <p>An independent project by Miloš Savić · Built with open data from OpenStreetMap &amp; Wikipedia</p>
-    <p style="margin-top:8px"><a href="https://milossavicgit.github.io/cultural-map/">Open the app</a></p>
-  </div>
+  © 2026 Miloš Savić · bymilossavic.com
 </footer>
-
-<script>
-  // gentle scroll-reveal
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
-  }, { threshold: 0.14 });
-  document.querySelectorAll('.reveal').forEach((el, i) => {
-    el.style.transitionDelay = (i % 3) * 0.08 + 's';
-    obs.observe(el);
-  });
-</script>
 </body>
 </html>
