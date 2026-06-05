@@ -1,139 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Miloš Savić | Tools for Discovery</title>
-  <meta name="description" content="Miloš Savić builds practical tools for discovery, maps, open data, geographic exploration and artificial intelligence.">
-  <style>
-    :root {
-      --paper: #f6f1e7;
-      --paper-2: #efe7d6;
-      --ink: #2a2118;
-      --muted: #6f6452;
-      --accent: #b5471f;
-      --accent-2: #2f6b4f;
-      --rule: #ddd1bb;
-      --shadow: rgba(60, 40, 20, 0.13);
-    }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--ink);
-      background: var(--paper);
-      line-height:1.6;
-    }
-    .wrap { max-width:1080px; margin:0 auto; padding:0 28px; }
-    header { padding:28px 0; border-bottom:1px solid var(--rule); }
-    .brand { font-size:22px; font-weight:700; }
-    .hero { padding:90px 0 60px; text-align:center; }
-    .eyebrow {
-      display:inline-block; padding:6px 14px; border:1px solid var(--rule);
-      border-radius:999px; margin-bottom:22px; color:var(--accent-2);
-      font-size:13px; font-weight:700;
-    }
-    h1 { font-size:clamp(42px,7vw,76px); margin-bottom:22px; }
-    .hero p { max-width:720px; margin:0 auto; color:var(--muted); font-size:20px; }
-    .projects { padding:40px 0 90px; }
-    .section-title { text-align:center; font-size:34px; margin-bottom:34px; }
-    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
-    .card {
-      background:rgba(255,255,255,0.55);
-      border:1px solid var(--rule);
-      border-radius:22px;
-      padding:30px;
-      min-height:340px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
-    .icon { font-size:40px; margin-bottom:18px; }
-    .status {
-      display:inline-block; margin-bottom:16px; padding:5px 11px;
-      border-radius:999px; font-size:12px; font-weight:700;
-      background:rgba(47,107,79,0.13); color:var(--accent-2);
-    }
-    .soon { background:rgba(181,71,31,0.12); color:var(--accent); }
-    .future { background:rgba(42,33,24,0.1); color:var(--ink); }
-    .button {
-      display:inline-block; padding:13px 20px; border-radius:999px;
-      background:var(--accent); color:white; text-decoration:none;
-      font-weight:700; text-align:center;
-    }
-    .disabled { background:#bbb; color:white; }
-    .about {
-      padding:70px 0; background:var(--paper-2);
-      border-top:1px solid var(--rule);
-      border-bottom:1px solid var(--rule);
-      text-align:center;
-    }
-    footer { padding:34px 0; text-align:center; color:var(--muted); }
-    @media(max-width:850px){
-      .grid{grid-template-columns:1fr;}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milos Savic</title>
+<meta name="description" content="Simple, practical digital tools by Milos Savic.">
+<style>
+:root{--bg:#f4efe6;--card:#fffdf8;--ink:#1f1b16;--muted:#7a6e5f;--accent:#b5471f;--accent-dark:#913818;--border:#d8cfbe}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.6}
+.container{max-width:1000px;margin:0 auto;padding:50px 24px 80px}
+header{border-bottom:1px solid var(--border);padding-bottom:35px;margin-bottom:45px}
+h1{margin:0;font-size:clamp(42px,6vw,68px);line-height:1}
+.subtitle{color:var(--muted);font-size:20px;margin-top:12px}
+.intro{max-width:850px;margin-top:25px;font-size:18px}
+h2{font-size:32px;margin-bottom:24px}
+.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.card h3{margin-top:0;margin-bottom:10px;font-size:28px}
+.card p{color:var(--muted)}
+.button{display:inline-block;text-decoration:none;background:var(--accent);color:white;padding:12px 18px;border-radius:10px;font-weight:bold}
+.button:hover{background:var(--accent-dark)}
+.future{margin-top:40px;padding-top:25px;border-top:1px solid var(--border);color:var(--muted)}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:14px}
+</style>
 </head>
 <body>
+<div class="container">
 <header>
-  <div class="wrap"><div class="brand">Miloš Savić</div></div>
+<h1>Milos Savic</h1>
+<div class="subtitle">Simple, practical digital tools for exploration, discovery, and everyday use.</div>
+<div class="intro">
+<p>I build free or very inexpensive tools designed to help people explore, learn, and discover the world around them.</p>
+<p>My goal is to create software that is intuitive, accessible, and easy to use — tools that solve real problems without unnecessary complexity.</p>
+</div>
 </header>
 
-<section class="hero">
-  <div class="wrap">
-    <div class="eyebrow">Building tools for discovery</div>
-    <h1>Maps, open data and AI tools.</h1>
-    <p>Practical projects for exploring places, information and patterns that are often hidden from traditional search.</p>
-  </div>
+<section>
+<h2>Projects</h2>
+
+<div class="projects">
+
+<div class="card">
+<h3>RoadScout</h3>
+<p>Discover interesting places around you using interactive maps and location-based exploration. RoadScout helps users find attractions, viewpoints, landmarks, and hidden gems near any destination.</p>
+<a class="button" href="https://milossavicgit.github.io/RoadScout/" target="_blank">Launch RoadScout →</a>
+</div>
+
+<div class="card">
+<h3>BeachScout</h3>
+<p>Explore beaches, naturist beaches, resorts, campsites, lakes, and swimming locations. Search around any town or destination and discover nearby places using interactive maps.</p>
+<a class="button" href="https://milossavicgit.github.io/BeachScout/" target="_blank">Launch BeachScout →</a>
+</div>
+
+</div>
+
+<div class="future">
+More tools and experiments will be added here as they mature from concept to public release.
+</div>
 </section>
 
-<section class="projects">
-  <div class="wrap">
-    <h2 class="section-title">Projects</h2>
-    <div class="grid">
-
-      <article class="card">
-        <div>
-          <div class="icon">🗺️</div>
-          <h2>RoadScout</h2>
-          <span class="status">Active</span>
-          <p>Find attractions, cultural sites, landmarks and hidden places around you or along your route.</p>
-        </div>
-        <a class="button" href="https://milossavicgit.github.io/cultural-map/">Open RoadScout</a>
-      </article>
-
-      <article class="card">
-        <div>
-          <div class="icon">🏖️</div>
-          <h2>Naturist Beach Explorer</h2>
-          <span class="status soon">In Development</span>
-          <p>A future map-based guide to official and customary naturist beaches using public geographic data.</p>
-        </div>
-        <span class="button disabled">Coming Soon</span>
-      </article>
-
-      <article class="card">
-        <div>
-          <div class="icon">🚧</div>
-          <h2>Future RoadScout Features</h2>
-          <span class="status future">Planned</span>
-          <p>User-submitted places, photo uploads, community verification and image moderation.</p>
-        </div>
-        <span class="button disabled">Planned</span>
-      </article>
-
-    </div>
-  </div>
-</section>
-
-<section class="about">
-  <div class="wrap">
-    <h2>About</h2>
-    <p>I am an independent builder from Serbia interested in maps, travel, open data and practical AI applications.</p>
-  </div>
-</section>
-
-<footer>
-  © 2026 Miloš Savić · bymilossavic.com
-</footer>
+<footer>© 2026 Milos Savic</footer>
+</div>
 </body>
 </html>
