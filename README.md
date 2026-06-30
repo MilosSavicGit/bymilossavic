@@ -167,3 +167,4 @@ documenting and preserving knowledge about places around the world.
 ## Website
 
 https://bymilossavic.com
+contact@bymilossavic.com
