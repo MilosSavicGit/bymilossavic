@@ -60,6 +60,34 @@ engine developed for BeachScout.
 
 ------------------------------------------------------------------------
 
+## 🏨 HotelScout
+
+HotelScout helps travellers discover accommodation along driving routes
+or near their current location.
+
+### Focus
+
+-   Hotels
+-   Motels
+-   Guest houses
+-   Hostels
+-   Apartments
+-   Resorts
+-   Campsites
+-   Caravan / RV sites
+
+### Features
+
+-   Route-based accommodation search
+-   Nearby accommodation search
+-   Official website lookup
+-   Google Maps integration
+-   Community photographs
+-   Community descriptions
+-   Android support
+
+------------------------------------------------------------------------
+
 # Planned Applications
 
 -   ⛰ MountainScout
@@ -97,6 +125,8 @@ engine developed for BeachScout.
 -   Translation
 -   Analytics
 -   Google Maps integration
+-   Official website lookup
+-   Community recommendations
 
 ------------------------------------------------------------------------
 
@@ -107,7 +137,7 @@ ScoutPlatform intentionally avoids downloading large regional datasets.
 Instead, every application performs live semantic searches using current
 OpenStreetMap information.
 
-Benefits include:
+## Benefits
 
 -   Worldwide coverage
 -   Current geographic information
@@ -140,7 +170,8 @@ The platform encourages communities to contribute:
 ## Current
 
 -   ✅ BeachScout 1.0
--   🚧 RoadScout 2.0
+-   ✅ RoadScout 1.0
+-   🚧 HotelScout 1.0 Prototype
 
 ## Planned
 
@@ -154,7 +185,7 @@ The platform encourages communities to contribute:
 
 # About
 
-Created by **Milos Savic**
+**Milos Savic**
 
 Belgrade, Serbia
 
@@ -164,7 +195,12 @@ documenting and preserving knowledge about places around the world.
 
 ------------------------------------------------------------------------
 
-## Website
+# Contact
 
-https://bymilossavic.com
-contact@bymilossavic.com
+**Milos Savic**
+
+Founder, ScoutPlatform
+
+🌐 **Website:** https://bymilossavic.com
+
+📧 **Email:** contact@bymilossavic.com
