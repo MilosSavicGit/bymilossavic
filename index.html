@@ -40,6 +40,13 @@
     .legal-links a{display:block;background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:16px;color:var(--ink)}
     .tech{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
     .tech span{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:10px;text-align:center;font-size:14px}
+    .highlight{background:linear-gradient(180deg,#fffdf8,#f6f1e6);border:2px solid var(--green);border-radius:22px;padding:26px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    .highlight h3{font-size:26px}
+    .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .pill{background:#dcfce7;color:var(--green);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:bold}
+    .pill.warn{background:#fee2e2;color:#9a4226}
+    .pill.mid{background:#ece7dc;color:#6b6151}
+    .caveat{color:var(--muted);font-size:14px;margin-top:14px;font-style:italic}
     footer{border-top:1px solid var(--rule);margin-top:44px;padding-top:20px;color:var(--muted);font-size:14px}
     @media(max-width:820px){
       header,.section-head{grid-template-columns:1fr}
@@ -58,23 +65,88 @@
         <p class="lead">ScoutPlatform is an independent project by Milos Savic. Its applications help people discover useful and interesting places around the world through open geographic data, clear maps and responsible community contributions.</p>
         <div class="button-row">
           <a class="btn" href="https://milossavicgit.github.io/BeachScout/">Open BeachScout</a>
+          <a class="btn blue" href="https://play.google.com/store/apps/details?id=com.milossavic.beachscout">Get it on Google Play</a>
           <a class="btn secondary" href="contact.html">Contact</a>
         </div>
       </div>
       <div class="status-card">
-        <div class="badge">Available Now</div>
-        <h3>BeachScout</h3>
-        <p>BeachScout is available as both a <strong>web application</strong> and an <strong>Android app</strong>. It helps people discover beaches, naturist beaches, swimming places, naturist resorts and campsites worldwide using open geographic data and community knowledge.</p>
+        <div class="badge">BeachScout 2.3 &mdash; live on Google Play</div>
+        <h3>New: dog-friendly beaches</h3>
+        <p>BeachScout now reads dog access straight from OpenStreetMap and shows it on the beach page, plus a whole-country map of every beach that records a dog rule. As far as we know, no other beach app does this.</p>
         <ul>
-          <li>Available on Web and Android</li>
-          <li>Search around any town or current location</li>
-          <li>Explore nearby beaches on an interactive map</li>
-          <li>Find naturist locations where data is available</li>
-          <li>Satellite and street map views</li>
-          <li>Powered by open geographic data</li>
+          <li>Dog access: allowed, on a lead, banned or seasonal</li>
+          <li>Country-wide maps for dog and naturist places</li>
+          <li>Accommodation within 3 km, with address and phone</li>
+          <li>Sea temperature, waves, wind and UV</li>
+          <li>Nearest public parking</li>
         </ul>
       </div>
     </header>
+
+    <section>
+      <div class="section-head">
+        <h2>What you can search</h2>
+        <div class="section-note">BeachScout started as a beach map. It has grown into a way of asking practical questions about a stretch of coast before you drive to it.</div>
+      </div>
+
+      <div class="highlight">
+        <div class="badge">New in 2.3</div>
+        <h3>&#128021; Can I bring my dog?</h3>
+        <p>Most beach apps cannot answer this. BeachScout can, wherever a local mapper has recorded it. Open <strong>Dog beaches in this country</strong> and you get every beach in that country that states a rule, on one map, colour-coded:</p>
+        <div class="pill-row">
+          <span class="pill">Dogs allowed</span>
+          <span class="pill">Dedicated dog beach</span>
+          <span class="pill">On a lead</span>
+          <span class="pill warn">Dogs not allowed</span>
+          <span class="pill mid">Changes with the season</span>
+        </div>
+        <p style="margin-top:14px">Tap any dot for the full beach page: conditions, accommodation nearby, parking and coordinates. A ban is shown just as clearly as permission &mdash; knowing where you cannot go saves a wasted journey.</p>
+        <p class="caveat">Coverage depends entirely on what local mappers have recorded, and it is uneven. Germany, Croatia, Spain and the Netherlands are well mapped; many countries have almost nothing yet. A beach with no dog tag is not a beach that bans dogs &mdash; it is a beach nobody has recorded. BeachScout never guesses, and always tells you to check local signs.</p>
+      </div>
+
+      <div class="grid" style="margin-top:16px">
+        <div class="card">
+          <h3>&#128205; Detailed search</h3>
+          <p>Search 10 km around any town in the world, or 10 km around wherever you are standing.</p>
+          <ul>
+            <li>Beaches, lake and river swimming places</li>
+            <li>Naturist beaches, resorts and campsites</li>
+            <li>Beach resorts, lidos and swimming pools</li>
+            <li>Local names translated to English where the data allows</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>&#127958; Naturist places, country by country</h3>
+          <p>The whole of a country's naturist coastline on one map, in the same colours the search uses.</p>
+          <ul>
+            <li>Official and customary naturist beaches</li>
+            <li>Naturist resorts, villages and campsites</li>
+            <li>Naturist swimming pools</li>
+            <li>Browse as a map or as a grouped list</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>&#127754; Beach conditions</h3>
+          <p>What the water is doing today, at that beach, before you set off.</p>
+          <ul>
+            <li>Air and sea temperature</li>
+            <li>Wave height and wind</li>
+            <li>UV index and rain</li>
+            <li>Sunset time</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>&#127976; Stay nearby and parking</h3>
+          <p>Practical detail for actually getting there and staying the night.</p>
+          <ul>
+            <li>Hotels, guest houses, apartments and campsites within 3 km</li>
+            <li>Full postal address in the local convention</li>
+            <li>Telephone number and official website</li>
+            <li>Nearest public parking, with walking directions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
     <section>
       <div class="section-head">
@@ -83,19 +155,21 @@
       </div>
       <div class="grid">
         <div class="card">
-          <div class="badge">Stable</div>
+          <div class="badge">Live &mdash; web and Android</div>
           <h3>🏖 BeachScout</h3>
-          <p>Discover beaches, naturist beaches, swimming places, naturist resorts and campsites worldwide.</p>
+          <p>Discover beaches, dog-friendly beaches, naturist beaches, swimming places, naturist resorts and campsites worldwide.</p>
           <ul>
-            <li>Worldwide 10 km local search</li>
-            <li>Current location search</li>
-            <li>Satellite maps</li>
+            <li>Detailed 10 km search, worldwide</li>
+            <li>Search where you are standing</li>
+            <li>Dog access shown on every beach that records it</li>
+            <li>Country-wide dog and naturist maps</li>
+            <li>Sea conditions, accommodation and parking</li>
+            <li>Satellite and street maps</li>
             <li>Community photos and descriptions</li>
-            <li>Translation to English where available</li>
-            <li>Available on Web and Android</li>
           </ul>
           <div class="button-row">
-            <a class="btn blue" href="#">Google Play coming soon</a>
+            <a class="btn" href="https://milossavicgit.github.io/BeachScout/">Launch BeachScout</a>
+            <a class="btn blue" href="https://play.google.com/store/apps/details?id=com.milossavic.beachscout">Get it on Google Play</a>
           </div>
         </div>
         <div class="card">
@@ -120,17 +194,46 @@
         <h2>Coming next</h2>
         <div class="section-note">ScoutPlatform is designed to grow into a wider ecosystem of focused exploration tools.</div>
       </div>
-      <div class="grid three">
-        <div class="card"><h3>⛰ MountainScout</h3><p>Mountains, viewpoints and trails.</p></div>
-        <div class="card"><h3>🏛 HeritageScout</h3><p>Historic sites and cultural places.</p></div>
-        <div class="card"><h3>🏨 HotelScout</h3><p>Travel accommodation discovery ideas.</p></div>
+      <div class="grid">
+        <div class="card">
+          <div class="badge planned">In development</div>
+          <h3>&#128663; ParkingScout</h3>
+          <p>A map of a city's parking that makes clear which of it is free &mdash; the question every driver actually has.</p>
+          <ul>
+            <li>Public car parks, garages and street parking</li>
+            <li>Free, paid and unknown shown honestly apart</li>
+            <li>Park-and-ride sites on the edge of the city</li>
+            <li>Capacity, opening hours and accessible spaces</li>
+          </ul>
+          <p class="caveat">Groundwork underway. Parking data has been measured across seven cities to establish where it is complete enough to be trusted. Unrecorded parking will never be shown as free.</p>
+        </div>
+        <div class="card">
+          <div class="badge planned">In development</div>
+          <h3>&#127976; HotelScout</h3>
+          <p>Accommodation along a route rather than at a single point &mdash; for the night you have not planned yet, somewhere between A and B.</p>
+          <ul>
+            <li>Search a whole route corridor, not just one town</li>
+            <li>Hotels, motels, guest houses and campsites</li>
+            <li>Full address, telephone and official website</li>
+            <li>Built on the same open data as BeachScout</li>
+          </ul>
+          <p class="caveat">An early web version exists and is being rebuilt on the BeachScout foundations.</p>
+        </div>
+        <div class="card">
+          <h3>⛰ MountainScout</h3>
+          <p>Mountains, viewpoints and trails, with the ascent and the season made plain.</p>
+        </div>
+        <div class="card">
+          <h3>🏛 HeritageScout</h3>
+          <p>Historic sites and cultural places, drawing on OpenStreetMap and Wikimedia.</p>
+        </div>
       </div>
     </section>
 
     <section>
       <div class="section-head">
         <h2>Launch information</h2>
-        <div class="section-note">Useful links for users, support, privacy information and data requests.</div>
+        <div class="section-note">Information required by users and app stores, kept current with the published Android release.</div>
       </div>
       <div class="legal-links">
         <a href="privacy.html"><strong>Privacy Policy</strong><br>Explains location use, analytics, user uploads and data handling.</a>
@@ -181,8 +284,7 @@
         <a href="contact.html">Contact</a> ·
         <a href="data-deletion.html">Data Deletion</a>
       </p>
-      <p><strong>Support:</strong> <a href="mailto:contact@bymilossavic.com">contact@bymilossavic.com</a></p>
-      <p>© 2026 Milos Savic / ScoutPlatform.</p>
+      <p>© 2026 Milos Savic / ScoutPlatform. BeachScout 2.3, live on web and Google Play.</p>
       <p>Geographic names are used for practical search purposes and do not imply political positions.</p>
     </footer>
   </div>
