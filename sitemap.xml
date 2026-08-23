@@ -1,9 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xml for bymilossavic.com
+
+  The previous version listed only the homepage, so the four legal pages and
+  everything else were left for Google to stumble across on its own. Anything
+  missing here is found slower, and sometimes not at all.
+
+  lastmod dates are taken from when each file was actually last changed. Keep
+  them honest: a sitemap that claims everything changed today, every day, gets
+  its dates ignored.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <url>
     <loc>https://bymilossavic.com/</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Country guides. One per country as they are written; each is a real
+       landing page for searches like "naturist beaches france", which the
+       homepage itself will never rank for. -->
+  <url>
+    <loc>https://bymilossavic.com/naturist-beaches-france.html</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Required by Google Play and referenced from the app listing, so they
+       need to be indexable even though nobody searches for them. -->
+  <url>
+    <loc>https://bymilossavic.com/privacy.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://bymilossavic.com/terms.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://bymilossavic.com/contact.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://bymilossavic.com/data-deletion.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
 </urlset>

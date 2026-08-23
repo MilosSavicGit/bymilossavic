@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ScoutPlatform by Milos Savic</title>
+
+  <!-- =========================================================================
+       CHANGED 23 Aug 2026 — two additions, nothing else touched:
+         1. meta description + canonical (there were none, so search engines
+            were inventing a description from whatever text they found first)
+         2. a link to naturist-beaches-france.html in the naturist card
+       ====================================================================== -->
+  <title>ScoutPlatform &mdash; BeachScout, ParkingScout, EVchargeScout</title>
+  <meta name="description" content="Free exploration tools built on open data: naturist and dog-friendly beaches, city parking, and EV road-trip charging. No accounts, no fees." />
+  <link rel="canonical" href="https://bymilossavic.com/" />
+
   <style>
     :root{
       --paper:#f4efe6; --panel:#fffdf8; --ink:#1c1a17;
@@ -47,6 +57,7 @@
     .pill.warn{background:#fee2e2;color:#9a4226}
     .pill.mid{background:#ece7dc;color:#6b6151}
     .caveat{color:var(--muted);font-size:14px;margin-top:14px;font-style:italic}
+    .guide-link{margin-top:12px !important;padding-top:12px;border-top:1px solid var(--rule)}
     footer{border-top:1px solid var(--rule);margin-top:44px;padding-top:20px;color:var(--muted);font-size:14px}
     @media(max-width:820px){
       header,.section-head{grid-template-columns:1fr}
@@ -124,6 +135,9 @@
             <li>Naturist swimming pools</li>
             <li>Browse as a map or as a grouped list</li>
           </ul>
+          <!-- ADDED 23 Aug 2026. This is the only inbound link to the country
+               guide; without it the page is an orphan and ranks accordingly. -->
+          <p class="guide-link"><a href="naturist-beaches-france.html">Naturist beaches in France</a> &mdash; all 563 mapped locations, and what the official and customary labels actually mean. More countries to follow.</p>
         </div>
         <div class="card">
           <h3>&#127754; Beach conditions</h3>
