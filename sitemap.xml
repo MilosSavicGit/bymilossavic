@@ -29,6 +29,17 @@
     <priority>0.8</priority>
   </url>
 
+
+  <!-- The About page. This is the canonical page for Milos Savic as a person;
+       the schema on every other page points its Person entity here, so it needs
+       to be crawlable. -->
+  <url>
+    <loc>https://bymilossavic.com/about.html</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Required by Google Play and referenced from the app listing, so they
        need to be indexable even though nobody searches for them. -->
   <url>

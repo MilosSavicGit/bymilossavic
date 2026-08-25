@@ -222,13 +222,49 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Naturist beaches in France",
-  "description": "563 naturist beaches, campsites and resorts mapped in France, of which 21 are officially designated.",
-  "author": { "@type": "Person", "name": "Milos Savic" },
-  "publisher": { "@type": "Organization", "name": "ScoutPlatform" },
-  "dateModified": "2026-08-23",
-  "isBasedOn": "https://www.openstreetmap.org/"
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://bymilossavic.com/naturist-beaches-france.html#article",
+      "headline": "Naturist beaches in France",
+      "description": "563 naturist beaches, campsites and resorts mapped in France, of which 21 are officially designated.",
+      "url": "https://bymilossavic.com/naturist-beaches-france.html",
+      "mainEntityOfPage": "https://bymilossavic.com/naturist-beaches-france.html",
+      "dateModified": "2026-08-23",
+      "inLanguage": "en",
+      "isBasedOn": "https://www.openstreetmap.org/",
+      "author": {
+        "@id": "https://bymilossavic.com/#milos-savic"
+      },
+      "publisher": {
+        "@id": "https://bymilossavic.com/#scoutplatform"
+      },
+      "isPartOf": {
+        "@id": "https://bymilossavic.com/#website"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://bymilossavic.com/#milos-savic",
+      "name": "Miloš Savić",
+      "alternateName": "Milos Savic",
+      "url": "https://bymilossavic.com/about.html",
+      "jobTitle": "Independent Software Developer",
+      "sameAs": [
+        "https://github.com/milossavicgit",
+        "https://www.linkedin.com/in/milossavic/"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://bymilossavic.com/#scoutplatform",
+      "name": "ScoutPlatform",
+      "url": "https://bymilossavic.com/",
+      "founder": {
+        "@id": "https://bymilossavic.com/#milos-savic"
+      }
+    }
+  ]
 }
 </script>
 
