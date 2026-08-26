@@ -10,38 +10,47 @@ The platform combines open geographic resources with community
 contributions to create practical tools for exploration while supporting
 the wider open knowledge ecosystem.
 
+No accounts. No fees. No tracking.
+
+🌐 **bymilossavic.com** · 📱 **[ScoutPlatform on Google Play](https://play.google.com/store/apps/dev?id=4627318307378995391)**
+
 ------------------------------------------------------------------------
 
 # Current Applications
 
-## 🏖 BeachScout
+## 🏖 BeachScout — 2.3, live on web and Google Play
 
-BeachScout is a browser-based and Android-compatible application for
-discovering:
+A browser-based and Android application for discovering beaches
+worldwide.
 
--   Beaches
--   Naturist beaches
--   Naturist resorts
--   Campsites
--   Swimming locations
+### Finds
+
+-   Beaches and swimming locations
+-   Naturist beaches, resorts and campsites
+-   Dog-friendly beaches
 
 ### Features
 
 -   Worldwide search
--   Community photographs
--   Community descriptions
--   Translation
--   Moderation
--   Android support
+-   Dog access read straight from OpenStreetMap: allowed, on a lead,
+    banned, or seasonal — shown country-wide on one map
+-   Sea temperature, waves, wind and UV
+-   Accommodation within 3 km, with address and phone
+-   Nearest public parking
+-   Community photographs and descriptions
+-   Translation and moderation
 -   Google Maps integration
 -   Wikipedia and Wikimedia links
 
+🔗 [Open BeachScout](https://milossavicgit.github.io/BeachScout/) ·
+[Google Play](https://play.google.com/store/apps/details?id=com.milossavic.beachscout)
+
 ------------------------------------------------------------------------
 
-## 🛣 RoadScout
+## 🛣 RoadScout — live on web
 
-RoadScout helps users discover interesting places along driving routes
-or near their current location.
+Discovers interesting places along driving routes or near the current
+location.
 
 ### Focus
 
@@ -55,15 +64,47 @@ or near their current location.
 -   Waterfalls
 -   Caves
 
-RoadScout is currently being upgraded to use the shared ScoutPlatform
-engine developed for BeachScout.
+🔗 [Open RoadScout](https://milossavicgit.github.io/RoadScout/)
 
 ------------------------------------------------------------------------
 
-## 🏨 HotelScout
+## 🅿 ParkingScout — early access
 
-HotelScout helps travellers discover accommodation along driving routes
-or near their current location.
+City parking maps that separate free parking from paid, with EV charging
+points included.
+
+### Focus
+
+-   Free parking
+-   Paid parking
+-   On-street and off-street
+-   EV charging points
+
+🔗 [Open ParkingScout](https://milossavicgit.github.io/ParkingScout/)
+
+------------------------------------------------------------------------
+
+## 🔌 EVchargeScout — early access
+
+An EV road-trip charging planner. Enter a route and the vehicle's range;
+EVchargeScout traces the real road route, ferries included, and picks
+fast-charger stops with a range safety margin.
+
+### Features
+
+-   Route-based charging stops
+-   Range safety margins
+-   Driving, charging and total time
+-   Accommodation near charging stops
+
+🔗 [Open EVchargeScout](https://milossavicgit.github.io/EVchargeScout/)
+
+------------------------------------------------------------------------
+
+## 🏨 HotelScout — early access
+
+Accommodation search along a whole route rather than around a single
+point.
 
 ### Focus
 
@@ -82,9 +123,9 @@ or near their current location.
 -   Nearby accommodation search
 -   Official website lookup
 -   Google Maps integration
--   Community photographs
--   Community descriptions
--   Android support
+-   Community photographs and descriptions
+
+🔗 [Open HotelScout](https://milossavicgit.github.io/HotelScout/)
 
 ------------------------------------------------------------------------
 
@@ -103,8 +144,9 @@ or near their current location.
 ## Mapping
 
 -   MapLibre GL JS
--   MapTiler
--   OpenStreetMap
+-   OpenFreeMap (Liberty style, OpenMapTiles schema) — BeachScout
+-   MapTiler — RoadScout, HotelScout
+-   OpenStreetMap data throughout
 
 ## Search
 
@@ -167,11 +209,16 @@ The platform encourages communities to contribute:
 
 # Roadmap
 
-## Current
+## Live
 
--   ✅ BeachScout 1.0
--   ✅ RoadScout 1.0
--   🚧 HotelScout 1.0 Prototype
+-   ✅ BeachScout 2.3 — web and Google Play
+-   ✅ RoadScout — web
+
+## Early access
+
+-   🚧 ParkingScout
+-   🚧 EVchargeScout
+-   🚧 HotelScout
 
 ## Planned
 
@@ -185,7 +232,7 @@ The platform encourages communities to contribute:
 
 # About
 
-**Milos Savic**
+**Miloš Savić**
 
 Belgrade, Serbia
 
@@ -193,14 +240,19 @@ ScoutPlatform is an independent initiative focused on building
 practical, community-powered geospatial applications for discovering,
 documenting and preserving knowledge about places around the world.
 
+The project is independent, community-oriented and built with the goal
+of remaining free or inexpensive to use.
+
 ------------------------------------------------------------------------
 
 # Contact
 
-**Milos Savic**
+**Miloš Savić**
 
 Founder, ScoutPlatform
 
 🌐 **Website:** https://bymilossavic.com
 
 📧 **Email:** contact@bymilossavic.com
+
+🔗 **About the developer:** https://bymilossavic.com/about.html
