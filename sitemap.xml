@@ -1,11 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xml for bymilossavic.com
+
+  Includes the ScoutPlatform homepage, the dedicated BeachScout landing page,
+  the France naturist country guide, creator information and required support /
+  legal pages.
+
+  Keep lastmod dates honest: update a date only when that page has actually
+  changed.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://bymilossavic.com/</loc></url>
-  <url><loc>https://bymilossavic.com/beachscout.html</loc></url>
-  <url><loc>https://bymilossavic.com/naturist-beaches-france.html</loc></url>
-  <url><loc>https://bymilossavic.com/about.html</loc></url>
-  <url><loc>https://bymilossavic.com/privacy.html</loc></url>
-  <url><loc>https://bymilossavic.com/terms.html</loc></url>
-  <url><loc>https://bymilossavic.com/contact.html</loc></url>
-  <url><loc>https://bymilossavic.com/data-deletion.html</loc></url>
+
+  <url>
+    <loc>https://bymilossavic.com/</loc>
+    <lastmod>2026-09-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Dedicated BeachScout landing page for searches such as naturist beach
+       map, nudist beaches, clothing-optional beaches and BeachScout. -->
+  <url>
+    <loc>https://bymilossavic.com/beachscout.html</loc>
+    <lastmod>2026-09-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Country guides. One per country as they are written; each is a real
+       landing page for searches like "naturist beaches france". -->
+  <url>
+    <loc>https://bymilossavic.com/naturist-beaches-france.html</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Canonical page for Milos Savic as a person. -->
+  <url>
+    <loc>https://bymilossavic.com/about.html</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Required/support pages referenced by the site and app listing. -->
+  <url>
+    <loc>https://bymilossavic.com/privacy.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://bymilossavic.com/terms.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://bymilossavic.com/contact.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://bymilossavic.com/data-deletion.html</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
 </urlset>
