@@ -1,258 +1,215 @@
-# ScoutPlatform
+ScoutPlatform
 
-**Discover. Document. Share.**
+Independent tools for travel, exploration and cultural discovery
 
-ScoutPlatform is a family of lightweight geospatial applications
-designed to help people discover, document and preserve knowledge about
-places around the world.
+Created by Miloš Savić
 
-The platform combines open geographic resources with community
-contributions to create practical tools for exploration while supporting
-the wider open knowledge ecosystem.
+Website: https://bymilossavic.com
 
-No accounts. No fees. No tracking.
+ScoutPlatform is a growing collection of free, independent web applications designed for geographical exploration, journey planning and cultural discovery.
 
-🌐 **bymilossavic.com** · 📱 **[ScoutPlatform on Google Play](https://play.google.com/store/apps/dev?id=4627318307378995391)**
+The project combines open geographical data, public information and cultural resources to create practical tools that help users discover places, plan journeys and explore books, music and cinema.
 
-------------------------------------------------------------------------
+Rather than concentrating on commercial rankings or sponsored recommendations, ScoutPlatform encourages independent exploration.
 
-# Current Applications
+BeachScout — Discover beaches worldwide
 
-## 🏖 BeachScout — 2.3, live on web and Google Play
+BeachScout is a worldwide beach discovery application covering conventional beaches, naturist beaches, lakes and other swimming locations.
 
-A browser-based and Android application for discovering beaches
-worldwide.
+Users can explore beaches by country, location or geographical proximity, including lesser-known places that may not appear in conventional tourist guides.
 
-### Finds
+Principal features:
 
--   Beaches and swimming locations
--   Naturist beaches, resorts and campsites
--   Dog-friendly beaches
+Worldwide beach and swimming-location discovery.
 
-### Features
+Naturist beaches, resorts and other clothing-optional locations.
 
--   Worldwide search
--   Dog access read straight from OpenStreetMap: allowed, on a lead,
-    banned, or seasonal — shown country-wide on one map
--   Sea temperature, waves, wind and UV
--   Accommodation within 3 km, with address and phone
--   Nearest public parking
--   Community photographs and descriptions
--   Translation and moderation
--   Google Maps integration
--   Wikipedia and Wikimedia links
+Dog-friendly beach identification.
 
-🔗 [Open BeachScout](https://milossavicgit.github.io/BeachScout/) ·
-[Google Play](https://play.google.com/store/apps/details?id=com.milossavic.beachscout)
+Available weather, water temperature, wind, wave, UV and sunset information.
 
-------------------------------------------------------------------------
+Water-quality information where available.
 
-## 🛣 RoadScout — live on web
+Links to nearby accommodation.
 
-Discovers interesting places along driving routes or near the current
-location.
+Community suggestions, photographs and descriptions.
 
-### Focus
+BeachScout is designed for travellers who want to discover beaches beyond the most popular commercial resorts.
 
--   Historic sites
--   Heritage places
--   Museums
--   Public art
--   Viewpoints
--   Notable nature
--   Peaks
--   Waterfalls
--   Caves
+Status: Available on the web and published on Google Play for Android.
 
-🔗 [Open RoadScout](https://milossavicgit.github.io/RoadScout/)
+RoadScout — Cultural attractions along your journey
 
-------------------------------------------------------------------------
+RoadScout transforms ordinary road journeys into opportunities for cultural discovery.
 
-## 🅿 ParkingScout — early access
+Instead of simply calculating the fastest route between two destinations, it identifies interesting places along the way.
 
-City parking maps that separate free parking from paid, with EV charging
-points included.
+Users specify their starting point and destination, examine alternative routes and explore attractions within a selected distance of the road.
 
-### Focus
+Principal features:
 
--   Free parking
--   Paid parking
--   On-street and off-street
--   EV charging points
+Cultural attractions along driving routes.
 
-🔗 [Open ParkingScout](https://milossavicgit.github.io/ParkingScout/)
+Alternative route exploration.
 
-------------------------------------------------------------------------
+Nearby discovery around the user's current location.
 
-## 🔌 EVchargeScout — early access
+Historical monuments, museums, archaeological sites and notable buildings.
 
-An EV road-trip charging planner. Enter a route and the vehicle's range;
-EVchargeScout traces the real road route, ferries included, and picks
-fast-charger stops with a range safety margin.
+Interactive mapping and route-order presentation.
 
-### Features
+Community photographs and descriptions.
 
--   Route-based charging stops
--   Range safety margins
--   Driving, charging and total time
--   Accommodation near charging stops
+RoadScout is intended for travellers who believe the journey itself can be as interesting as the destination.
 
-🔗 [Open EVchargeScout](https://milossavicgit.github.io/EVchargeScout/)
+EVJourneyScout — Electric vehicle journey planning
 
-------------------------------------------------------------------------
+EVJourneyScout helps electric vehicle drivers discover charging infrastructure along planned routes.
 
-## 🏨 HotelScout — early access
+The application is particularly useful for international journeys, where charging standards, connector compatibility, charging speeds and station density differ between countries.
 
-Accommodation search along a whole route rather than around a single
-point.
+Principal features:
 
-### Focus
+Route-based charging-station discovery.
 
--   Hotels
--   Motels
--   Guest houses
--   Hostels
--   Apartments
--   Resorts
--   Campsites
--   Caravan / RV sites
+Connector compatibility considerations.
 
-### Features
+International charging infrastructure coverage.
 
--   Route-based accommodation search
--   Nearby accommodation search
--   Official website lookup
--   Google Maps integration
--   Community photographs and descriptions
+Data from Open Charge Map and OpenStreetMap.
 
-🔗 [Open HotelScout](https://milossavicgit.github.io/HotelScout/)
+Automated charging-data updates through scheduled GitHub workflows.
 
-------------------------------------------------------------------------
+Interactive mapping of charging locations.
 
-# Planned Applications
+EVJourneyScout aims to make long-distance electric vehicle travel easier to investigate and plan.
 
--   ⛰ MountainScout
--   🏛 HeritageScout
--   🌊 LakeScout
--   🕳 CaveScout
--   🐦 BirdScout
+Charging data may not reflect live availability or operational status. Drivers should verify critical charging arrangements with the station operator.
 
-------------------------------------------------------------------------
+BookScout — International literary discovery
 
-# ScoutPlatform Engine
+BookScout explores books across countries, genres and publishing traditions.
 
-## Mapping
+The application combines international bestseller information with attention to independent publishers and literature available in English translation.
 
--   MapLibre GL JS
--   OpenFreeMap (Liberty style, OpenMapTiles schema) — BeachScout
--   MapTiler — RoadScout, HotelScout
--   OpenStreetMap data throughout
+Its purpose is to broaden literary discovery beyond the dominant English-language publishing markets.
 
-## Search
+Principal areas of interest:
 
--   Nominatim
--   Overpass API
+Bestseller lists from different countries.
 
-## Backend
+Clearly distinguished literary genres.
 
--   Supabase
+Independent publishers.
 
-## Shared Features
+International literature available in English translation.
 
--   Predictive search
--   Interactive maps
--   Community photographs
--   Community descriptions
--   Moderation
--   Translation
--   Analytics
--   Google Maps integration
--   Official website lookup
--   Community recommendations
+Comparisons of reading interests and publishing trends.
 
-------------------------------------------------------------------------
+BookScout aims to help readers discover authors and works they might otherwise overlook.
 
-# Design Philosophy
+MusicScout — Music beyond conventional charts
 
-ScoutPlatform intentionally avoids downloading large regional datasets.
+MusicScout is an international music discovery application combining popular music charts with independent critical perspectives.
 
-Instead, every application performs live semantic searches using current
-OpenStreetMap information.
+It recognises that musical tastes differ considerably across generations, countries and cultural backgrounds.
 
-## Benefits
+Principal features:
 
--   Worldwide coverage
--   Current geographic information
--   Lightweight applications
--   Low bandwidth usage
--   Low operating cost
+International music charts.
 
-------------------------------------------------------------------------
+Dedicated psychedelic music charts.
 
-# Open Knowledge
+Blues, chill-out and dance music.
 
-ScoutPlatform complements projects such as:
+Critics' choices and retrospective selections.
 
--   OpenStreetMap
--   Wikipedia
--   Wikimedia Commons
--   Wikidata
+Influential artists and recordings from earlier generations.
 
-The platform encourages communities to contribute:
+Contemporary discoveries within established musical traditions.
 
--   Original geotagged photographs
--   Local knowledge
--   Multilingual descriptions
--   Missing geographic information
+Links to external listening and video services.
 
-------------------------------------------------------------------------
+MusicScout is not intended to replace streaming platforms. Its purpose is to encourage wider musical exploration.
 
-# Roadmap
+FilmScout — European and independent cinema
 
-## Live
+FilmScout is an independent film discovery application with particular emphasis on European cinema, international auteur filmmaking, documentaries and critically recognised independent productions.
 
--   ✅ BeachScout 2.3 — web and Google Play
--   ✅ RoadScout — web
+The project aims to bring attention to films and filmmakers frequently overshadowed by mainstream commercial entertainment.
 
-## Early access
+Principal areas:
 
--   🚧 ParkingScout
--   🚧 EVchargeScout
--   🚧 HotelScout
+Italian, French and Spanish cinema.
 
-## Planned
+Notable films from other European countries.
 
--   MountainScout
--   HeritageScout
--   LakeScout
--   CaveScout
--   BirdScout
+American independent cinema, including Sundance-related productions.
 
-------------------------------------------------------------------------
+Exceptional world cinema.
 
-# About
+Documentaries.
 
-**Miloš Savić**
+Critics' Choice selections.
 
-Belgrade, Serbia
+Retrospectives of influential directors.
 
-ScoutPlatform is an independent initiative focused on building
-practical, community-powered geospatial applications for discovering,
-documenting and preserving knowledge about places around the world.
+FilmScout also includes original editorial writing about cinema.
 
-The project is independent, community-oriented and built with the goal
-of remaining free or inexpensive to use.
+Retrospectives devoted to Federico Fellini and Michelangelo Antonioni explore their lives, artistic development, filmmaking methods and contributions to cinema history.
 
-------------------------------------------------------------------------
+FilmScout is intended for viewers interested not only in what to watch, but also in the artistic and historical circumstances in which films were created.
 
-# Contact
+HotelScout — Under Development
 
-**Miloš Savić**
+HotelScout is a new experimental accommodation discovery application.
 
-Founder, ScoutPlatform
+Its purpose is to help travellers locate hotels and other accommodation near planned routes or their current location, examine geographical information and investigate individual establishments.
 
-🌐 **Website:** https://bymilossavic.com
+The project is at an early development stage, and its search methods and functionality are still being tested.
 
-📧 **Email:** contact@bymilossavic.com
+The ScoutPlatform philosophy
 
-🔗 **About the developer:** https://bymilossavic.com/about.html
+Free access. Applications are intended to remain available without subscription fees.
+
+Independent discovery. Users should be able to investigate alternatives without being directed primarily toward sponsored recommendations.
+
+Open information. Public geographical databases and accessible information sources provide the foundation for many ScoutPlatform tools.
+
+International perspective. Travel, literature, music and cinema should be explored across national and cultural boundaries.
+
+Practical simplicity. Applications should be accessible through ordinary web browsers on desktop and mobile devices.
+
+Continuous development. ScoutPlatform is an evolving independent project. Features, geographical coverage and data quality vary across applications.
+
+Technology
+
+ScoutPlatform applications use combinations of:
+
+HTML, CSS and JavaScript
+
+OpenStreetMap and Overpass API
+
+Nominatim geocoding
+
+OSRM route calculation
+
+MapLibre GL JS and Turf.js
+
+Open Charge Map
+
+Supabase
+
+GitHub Pages and Cloudflare
+
+AI-assisted software development
+
+Information supplied by third-party sources may be incomplete or outdated and should be verified when necessary.
+
+About the creator
+
+ScoutPlatform was created by Miloš Savić, a former geophysicist whose professional career subsequently moved into software development and consulting.
+
+The project combines interests in geography, travel, technology, literature, music and cinema with the possibilities offered by AI-assisted programming.
+
+Visit ScoutPlatform: https://bymilossavic.com
